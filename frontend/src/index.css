@@ -1,0 +1,445 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-900 font-sans;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-cross-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-white transform hover:scale-105 active:scale-95;
+    }
+
+    .btn-primary {
+        @apply bg-red-cross-600 text-white hover:bg-red-cross-700 px-4 py-2 hover-glow;
+    }
+
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-900 hover:bg-gray-300 px-4 py-2 hover:shadow-md;
+    }
+
+    .btn-outline {
+        @apply border border-red-cross-600 text-red-cross-600 hover:bg-red-cross-600 hover:text-white px-4 py-2 hover:shadow-md;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs;
+    }
+
+    .btn-lg {
+        @apply px-6 py-3 text-base;
+    }
+
+    .card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-300 hover-lift;
+    }
+
+    .card-animated {
+        @apply card animate-fade-in;
+    }
+
+    .card-hero {
+        @apply card animate-scale-in hover-glow;
+    }
+
+    .input {
+        @apply flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-cross-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200;
+    }
+
+    .input:hover {
+        @apply border-gray-400;
+    }
+
+    .input:focus {
+        @apply border-red-cross-500 ring-2 ring-red-cross-500/20;
+    }
+
+    select.input {
+        @apply cursor-pointer;
+    }
+
+    select.input option {
+        @apply py-2 px-3;
+    }
+
+    .label {
+        @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+    }
+
+    .badge {
+        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    }
+
+    .badge-success {
+        @apply bg-green-100 text-green-800;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-100 text-yellow-800;
+    }
+
+    .badge-error {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .badge-info {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    .loading-spinner {
+        @apply animate-spin rounded-full h-4 w-4 border-b-2 border-current;
+    }
+
+    .nav-link {
+        @apply flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 transform hover:scale-105;
+    }
+
+    .nav-link-active {
+        @apply bg-red-cross-100 text-red-cross-700 animate-slide-in-right;
+    }
+
+    .nav-link-inactive {
+        @apply text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+}
+
+.animate-heartbeat {
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Staggered animations */
+.animate-stagger-1 {
+    animation-delay: 0.1s;
+}
+
+.animate-stagger-2 {
+    animation-delay: 0.2s;
+}
+
+.animate-stagger-3 {
+    animation-delay: 0.3s;
+}
+
+.animate-stagger-4 {
+    animation-delay: 0.4s;
+}
+
+/* Hover animations */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hover-glow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+/* Loading states */
+.skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+}
+
+/* Red Cross specific styling */
+.red-cross-gradient {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.red-cross-pattern {
+    background-image:
+        radial-gradient(circle at 25% 25%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+}
+
+.red-cross-logo {
+    @apply animate-heartbeat;
+    transition: transform 0.3s ease;
+}
+
+.red-cross-logo:hover {
+    transform: scale(1.1);
+}
+
+/* Red Cross Symbol Enhancements */
+.red-cross-symbol {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: all 0.3s ease;
+}
+
+.red-cross-symbol:hover {
+    filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.3));
+    transform: scale(1.05);
+}
+
+.red-cross-symbol-glow {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+/* Enhanced Circular Red Cross */
+.red-cross-circle {
+    position: relative;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    transition: all 0.3s ease;
+}
+
+.red-cross-circle:hover {
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    transform: scale(1.1);
+}
+
+.red-cross-circle::before,
+.red-cross-circle::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 2px;
+}
+
+/* Horizontal bar of the cross */
+.red-cross-circle::before {
+    width: 60%;
+    height: 15%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Vertical bar of the cross */
+.red-cross-circle::after {
+    width: 15%;
+    height: 60%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Size variants for circular cross */
+.red-cross-circle-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.red-cross-circle-md {
+    width: 48px;
+    height: 48px;
+}
+
+.red-cross-circle-lg {
+    width: 64px;
+    height: 64px;
+}
+
+.red-cross-circle-xl {
+    width: 80px;
+    height: 80px;
+}
+
+.red-cross-circle-2xl {
+    width: 96px;
+    height: 96px;
+}
+
+/* Enhanced readability for Red Cross elements */
+.red-cross-text {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.red-cross-bg-readable {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.hero-section {
+    @apply animate-fade-in;
+}
+
+.stats-card {
+    @apply card-animated hover-lift;
+}
+
+.event-card {
+    @apply card-animated hover:shadow-lg transition-all duration-300;
+}
+
+.announcement-banner {
+    @apply animate-slide-in-left bg-red-cross-50 border-l-4 border-red-cross-500;
+}
+
+.donation-progress {
+    @apply transition-all duration-1000 ease-out;
+}
+
+.loading-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in;
+}
+
+.modal-content {
+    @apply animate-scale-in;
+}
+
+.notification-toast {
+    @apply animate-slide-in-right;
+}
+
+.page-transition {
+    @apply animate-fade-in;
+}

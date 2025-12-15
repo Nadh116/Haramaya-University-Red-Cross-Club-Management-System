@@ -1,0 +1,21 @@
+
+
+# Node
+node_modules/
+
+# Env files
+.env
+.env.local
+
+# Build folders
+dist/
+build/
+
+# Logs & coverage
+coverage/
+
+# OS files
+.DS_Store
+
+# Editor
+.vscode/
