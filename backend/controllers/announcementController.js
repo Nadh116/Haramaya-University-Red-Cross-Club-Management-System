@@ -70,9 +70,22 @@ exports.getAnnouncements = async (req, res, next) => {
             .limit(limit)
             .skip(startIndex);
 
+        // Filter out announcements with deleted authors or add default author info
+        const validAnnouncements = announcements.map(announcement => {
+            if (!announcement.author) {
+                // Create a default author object for announcements with deleted authors
+                announcement.author = {
+                    firstName: 'Unknown',
+                    lastName: 'Author',
+                    role: 'unknown'
+                };
+            }
+            return announcement;
+        });
+
         // Add view for authenticated users
         if (req.user) {
-            for (let announcement of announcements) {
+            for (let announcement of validAnnouncements) {
                 await announcement.addView(req.user.id, req.ip);
             }
         }
@@ -96,10 +109,10 @@ exports.getAnnouncements = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            count: announcements.length,
+            count: validAnnouncements.length,
             total,
             pagination,
-            announcements
+            announcements: validAnnouncements
         });
     } catch (error) {
         next(error);
@@ -122,6 +135,34 @@ exports.getAnnouncement = async (req, res, next) => {
                 success: false,
                 message: 'Announcement not found'
             });
+        }
+
+        // Handle missing author (deleted user)
+        if (!announcement.author) {
+            announcement.author = {
+                firstName: 'Unknown',
+                lastName: 'Author',
+                role: 'unknown',
+                email: 'unknown@example.com'
+            };
+        }
+
+        // Handle missing users in comments
+        if (announcement.comments) {
+            announcement.comments = announcement.comments.map(comment => {
+                if (!comment.user) {
+                    comment.user = {
+                        firstName: 'Unknown',
+                        lastName: 'User'
+                    };
+                }
+                return comment;
+            });
+        }
+
+        // Handle missing users in likes
+        if (announcement.likes) {
+            announcement.likes = announcement.likes.filter(like => like.user);
         }
 
         // Check if user can view this announcement

@@ -18,19 +18,59 @@ const dashboardRoutes = require('./routes/dashboard');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
+const logger = require('./utils/logger');
 
 const app = express();
 
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// Request logging middleware
+app.use(logger.requestLogger());
+
+// Rate limiting - Disabled for development, enabled for production only
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // Increased limit for development
-    message: 'Too many requests from this IP, please try again later.'
+    max: process.env.NODE_ENV === 'production' ? 1000 : 999999, // Essentially unlimited in development
+    message: {
+        success: false,
+        message: 'Too many requests from this IP, please try again later.',
+        retryAfter: Math.ceil(15 * 60) // 15 minutes in seconds
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => {
+        // Skip rate limiting entirely in development
+        return process.env.NODE_ENV !== 'production';
+    }
 });
-app.use('/api/', limiter);
+
+// Apply rate limiting only in production
+if (process.env.NODE_ENV === 'production') {
+    app.use('/api/', limiter);
+}
+
+// Stricter rate limiting for authentication endpoints only in production
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // Increased limit for auth endpoints
+    message: {
+        success: false,
+        message: 'Too many authentication attempts, please try again later.',
+        retryAfter: Math.ceil(15 * 60)
+    },
+    skipSuccessfulRequests: true,
+    skip: (req) => {
+        // Skip auth rate limiting in development
+        return process.env.NODE_ENV !== 'production';
+    }
+});
+
+// Apply stricter rate limiting to auth routes only in production
+if (process.env.NODE_ENV === 'production') {
+    app.use('/api/auth/login', authLimiter);
+    app.use('/api/auth/register', authLimiter);
+}
 
 // CORS configuration
 app.use(cors({
@@ -40,9 +80,29 @@ app.use(cors({
     credentials: true
 }));
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body parsing middleware with proper limits
+app.use(express.json({
+    limit: '10mb',
+    verify: (req, res, buf) => {
+        // Check if payload is too large
+        if (buf.length > 10 * 1024 * 1024) { // 10MB
+            const error = new Error('Payload too large');
+            error.status = 413;
+            throw error;
+        }
+    }
+}));
+app.use(express.urlencoded({
+    extended: true,
+    limit: '10mb',
+    verify: (req, res, buf) => {
+        if (buf.length > 10 * 1024 * 1024) {
+            const error = new Error('Payload too large');
+            error.status = 413;
+            throw error;
+        }
+    }
+}));
 
 // Static files
 app.use('/uploads', express.static('uploads'));
@@ -69,14 +129,48 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'Haramaya Red Cross API is running',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV
-    });
+// Health check endpoint with system status
+app.get('/api/health', async (req, res) => {
+    try {
+        // Check database connection
+        const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+
+        // Check memory usage
+        const memoryUsage = process.memoryUsage();
+
+        // System uptime
+        const uptime = process.uptime();
+
+        const healthData = {
+            success: true,
+            message: 'Haramaya Red Cross API is running',
+            timestamp: new Date().toISOString(),
+            environment: process.env.NODE_ENV,
+            status: {
+                database: dbStatus,
+                uptime: `${Math.floor(uptime / 60)} minutes`,
+                memory: {
+                    used: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
+                    total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`
+                }
+            }
+        };
+
+        // Log health check access
+        logger.info('Health check accessed', {
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        res.status(200).json(healthData);
+    } catch (error) {
+        logger.error('Health check failed', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Health check failed',
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // 404 handler

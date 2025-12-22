@@ -3,13 +3,28 @@
 @tailwind utilities;
 
 @layer base {
-    body {
-        @apply bg-gray-50 text-gray-900 font-sans;
-        font-feature-settings: "rlig" 1, "calt" 1;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     html {
         scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+
+    body {
+        @apply bg-gray-50 text-gray-900 font-sans;
+        font-feature-settings: "rlig" 1, "calt" 1;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    /* Prevent horizontal scroll */
+    .container {
+        max-width: 100%;
+        overflow-x: hidden;
     }
 }
 
@@ -256,21 +271,101 @@
     animation: shimmer 1.5s infinite;
 }
 
-/* Staggered animations */
-.animate-stagger-1 {
-    animation-delay: 0.1s;
+/* Enhanced dropdown visibility and styling */
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    width: 16rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e5e7eb;
+    z-index: 9999;
+    overflow: hidden;
 }
 
-.animate-stagger-2 {
-    animation-delay: 0.2s;
+.user-dropdown-header {
+    padding: 1rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.animate-stagger-3 {
-    animation-delay: 0.3s;
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid #f3f4f6;
 }
 
-.animate-stagger-4 {
-    animation-delay: 0.4s;
+.user-dropdown-item:hover {
+    background-color: #f9fafb;
+}
+
+.user-dropdown-logout {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #dc2626;
+    background: #fef2f2;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.user-dropdown-logout:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.user-dropdown-icon {
+    width: 1rem;
+    margin-right: 0.75rem;
+    color: #9ca3af;
+}
+
+.user-dropdown-logout .user-dropdown-icon {
+    color: #dc2626;
+}
+
+/* Ensure navbar doesn't overflow */
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    /* Allow flex items to shrink */
+}
+
+/* Navigation links container */
+.nav-links-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-links-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* User menu always visible */
+.user-menu-container {
+    flex-shrink: 0;
+    margin-left: 1rem;
 }
 
 /* Hover animations */
@@ -336,6 +431,8 @@
     position: relative;
     border-radius: 50%;
     background: #dc2626;
+    ;
+
     border: 3px solid #ffffff;
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     transition: all 0.3s ease;
@@ -442,4 +539,90 @@
 
 .page-transition {
     @apply animate-fade-in;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+/* Prose styles for announcement content */
+.prose {
+    color: #374151;
+    max-width: 65ch;
+}
+
+.prose p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+    color: #111827;
+    font-weight: 600;
+}
+
+.prose h1 {
+    font-size: 2.25em;
+    margin-top: 0;
+    margin-bottom: 0.8888889em;
+    line-height: 1.1111111;
+}
+
+.prose h2 {
+    font-size: 1.5em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.3333333;
+}
+
+.prose h3 {
+    font-size: 1.25em;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+    line-height: 1.6;
+}
+
+.prose ul,
+.prose ol {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    padding-left: 1.625em;
+}
+
+.prose li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.prose blockquote {
+    font-weight: 500;
+    font-style: italic;
+    color: #111827;
+    border-left-width: 0.25rem;
+    border-left-color: #e5e7eb;
+    quotes: "\201C" "\201D" "\2018" "\2019";
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+    padding-left: 1em;
 }

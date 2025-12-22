@@ -31,14 +31,13 @@ exports.validateUserRegistration = [
         .withMessage('Please provide a valid email'),
 
     body('password')
-        .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters'),
-    // Temporarily disabled for development
-    // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    // .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+        .isLength({ min: 8 })
+        .withMessage('Password must be at least 8 characters')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
 
     body('phone')
-        .isMobilePhone()
+        .matches(/^\+?[1-9]\d{1,14}$/)
         .withMessage('Please provide a valid phone number'),
 
     body('branch')
@@ -47,8 +46,8 @@ exports.validateUserRegistration = [
 
     body('studentId')
         .optional()
-        .isLength({ min: 4, max: 20 })
-        .withMessage('Student ID must be between 4 and 20 characters')
+        .isLength({ min: 4, max: 30 })
+        .withMessage('Student ID must be between 4 and 30 characters')
 ];
 
 // User login validation

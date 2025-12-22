@@ -137,11 +137,17 @@ router.get('/activities', async (req, res, next) => {
                 .limit(5);
 
             recentUsers.forEach(user => {
+                // Handle potential null user or missing fields
+                if (!user) return;
+
+                const userName = user.fullName || `${user.firstName || 'Unknown'} ${user.lastName || 'User'}`;
+                const branchName = user.branch ? user.branch.name : 'Unknown Branch';
+
                 activities.push({
                     type: 'user_registration',
-                    message: `${user.fullName} registered as ${user.role}`,
+                    message: `${userName} registered as ${user.role}`,
                     timestamp: user.createdAt,
-                    data: { user: user.fullName, role: user.role, branch: user.branch.name }
+                    data: { user: userName, role: user.role, branch: branchName }
                 });
             });
 
@@ -154,9 +160,16 @@ router.get('/activities', async (req, res, next) => {
                 .limit(5);
 
             recentDonations.forEach(donation => {
+                // Handle potential null donation or donor
+                if (!donation) return;
+
+                const donorName = donation.donor
+                    ? `${donation.donor.firstName || 'Unknown'} ${donation.donor.lastName || 'Donor'}`
+                    : 'Unknown Donor';
+
                 activities.push({
                     type: 'donation',
-                    message: `${donation.donor.firstName} ${donation.donor.lastName} made a ${donation.type} donation`,
+                    message: `${donorName} made a ${donation.type} donation`,
                     timestamp: donation.createdAt,
                     data: { type: donation.type, status: donation.status }
                 });
@@ -173,11 +186,18 @@ router.get('/activities', async (req, res, next) => {
             .limit(5);
 
         recentEvents.forEach(event => {
+            // Handle potential null event or organizer
+            if (!event) return;
+
+            const organizerName = event.organizer
+                ? `${event.organizer.firstName || 'Unknown'} ${event.organizer.lastName || 'Organizer'}`
+                : 'Unknown Organizer';
+
             activities.push({
                 type: 'event_created',
                 message: `New ${event.type.replace('_', ' ')} event: ${event.title}`,
                 timestamp: event.createdAt,
-                data: { title: event.title, type: event.type, startDate: event.startDate }
+                data: { title: event.title, type: event.type, startDate: event.startDate, organizer: organizerName }
             });
         });
 
@@ -191,11 +211,18 @@ router.get('/activities', async (req, res, next) => {
             .limit(5);
 
         recentAnnouncements.forEach(announcement => {
+            // Handle potential null announcement or author
+            if (!announcement) return;
+
+            const authorName = announcement.author
+                ? `${announcement.author.firstName || 'Unknown'} ${announcement.author.lastName || 'Author'}`
+                : 'Unknown Author';
+
             activities.push({
                 type: 'announcement',
                 message: `New ${announcement.type} announcement: ${announcement.title}`,
                 timestamp: announcement.publishDate,
-                data: { title: announcement.title, type: announcement.type, priority: announcement.priority }
+                data: { title: announcement.title, type: announcement.type, priority: announcement.priority, author: authorName }
             });
         });
 

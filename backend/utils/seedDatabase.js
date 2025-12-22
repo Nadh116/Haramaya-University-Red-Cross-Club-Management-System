@@ -76,7 +76,7 @@ const seedDatabase = async () => {
         console.log('Branches created...');
 
         // Create admin user
-        const adminUser = await User.create({
+        const adminUser = new User({
             firstName: 'System',
             lastName: 'Administrator',
             email: 'admin@haramaya.edu.et',
@@ -88,6 +88,7 @@ const seedDatabase = async () => {
             isApproved: true,
             bloodType: 'O+'
         });
+        await adminUser.save();
 
         // Create officer users
         const officers = [
@@ -127,7 +128,12 @@ const seedDatabase = async () => {
             }
         ];
 
-        const createdOfficers = await User.insertMany(officers);
+        const createdOfficers = [];
+        for (const officerData of officers) {
+            const officer = new User(officerData);
+            await officer.save();
+            createdOfficers.push(officer);
+        }
         console.log('Officers created...');
 
         // Create sample members
@@ -185,7 +191,12 @@ const seedDatabase = async () => {
             }
         ];
 
-        const createdMembers = await User.insertMany(members);
+        const createdMembers = [];
+        for (const memberData of members) {
+            const member = new User(memberData);
+            await member.save();
+            createdMembers.push(member);
+        }
         console.log('Members created...');
 
         // Create sample events

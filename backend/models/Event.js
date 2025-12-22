@@ -121,17 +121,18 @@ eventSchema.index({ isPublic: 1 });
 
 // Virtual for participant count
 eventSchema.virtual('participantCount').get(function () {
-    return this.participants.length;
+    return this.participants ? this.participants.length : 0;
 });
 
 // Virtual for available spots
 eventSchema.virtual('availableSpots').get(function () {
-    return this.maxParticipants - this.participants.length;
+    const participantCount = this.participants ? this.participants.length : 0;
+    return this.maxParticipants - participantCount;
 });
 
 // Virtual for average rating
 eventSchema.virtual('averageRating').get(function () {
-    if (this.feedback.length === 0) return 0;
+    if (!this.feedback || this.feedback.length === 0) return 0;
     const sum = this.feedback.reduce((acc, fb) => acc + fb.rating, 0);
     return (sum / this.feedback.length).toFixed(1);
 });

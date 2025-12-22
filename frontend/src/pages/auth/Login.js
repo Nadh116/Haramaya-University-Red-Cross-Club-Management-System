@@ -10,10 +10,25 @@ const Login = () => {
         password: ''
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
 
     const { login, loading, error, clearError, user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Load saved credentials from localStorage
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('rememberedEmail');
+        const savedPassword = localStorage.getItem('rememberedPassword');
+
+        if (savedEmail && savedPassword) {
+            setFormData({
+                email: savedEmail,
+                password: savedPassword
+            });
+            setRememberMe(true);
+        }
+    }, []);
 
     // Redirect if already logged in
     useEffect(() => {
@@ -42,17 +57,22 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Save credentials to localStorage if remember me is checked
+        if (rememberMe) {
+            localStorage.setItem('rememberedEmail', formData.email);
+            localStorage.setItem('rememberedPassword', formData.password);
+        } else {
+            // Clear saved credentials if remember me is unchecked
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('rememberedPassword');
+        }
+
         const result = await login(formData.email, formData.password);
 
         if (result.success) {
             const from = location.state?.from?.pathname || '/dashboard';
             navigate(from, { replace: true });
         }
-    };
-
-    const fillCredentials = (email, password) => {
-        setFormData({ email, password });
-        if (error) clearError();
     };
 
     return (
@@ -144,6 +164,8 @@ const Login = () => {
                                 id="remember-me"
                                 name="remember-me"
                                 type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
                                 className="h-4 w-4 text-red-cross-600 focus:ring-red-cross-500 border-gray-300 rounded"
                             />
                             <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -152,12 +174,12 @@ const Login = () => {
                         </div>
 
                         <div className="text-sm">
-                            <a
-                                href="#"
+                            <button
+                                type="button"
                                 className="font-medium text-red-cross-600 hover:text-red-cross-500"
                             >
                                 Forgot your password?
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -179,37 +201,6 @@ const Login = () => {
                                 </>
                             )}
                         </button>
-                    </div>
-
-                    {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-                        <h4 className="text-sm font-medium text-green-900 mb-2">✅ Demo Credentials (All Working):</h4>
-                        <div className="text-xs text-green-700 space-y-2">
-                            <button
-                                type="button"
-                                onClick={() => fillCredentials('admin@haramaya.edu.et', 'admin123')}
-                                className="block w-full text-left p-2 rounded hover:bg-green-100 transition-colors"
-                            >
-                                <strong>Admin:</strong> admin@haramaya.edu.et / admin123
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => fillCredentials('meron.tadesse@haramaya.edu.et', 'officer123')}
-                                className="block w-full text-left p-2 rounded hover:bg-green-100 transition-colors"
-                            >
-                                <strong>Officer:</strong> meron.tadesse@haramaya.edu.et / officer123
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => fillCredentials('sara.ahmed@student.haramaya.edu.et', 'member123')}
-                                className="block w-full text-left p-2 rounded hover:bg-green-100 transition-colors"
-                            >
-                                <strong>Member:</strong> sara.ahmed@student.haramaya.edu.et / member123
-                            </button>
-                        </div>
-                        <div className="mt-2 text-xs text-green-600">
-                            <strong>All accounts tested and working!</strong> Click any credential to auto-fill the form.
-                        </div>
                     </div>
                 </form>
 

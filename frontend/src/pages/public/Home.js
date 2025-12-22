@@ -46,10 +46,10 @@ const Home = () => {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="w-full overflow-x-hidden">
             {/* Hero Section with Clear Red Cross Group Background */}
             <section
-                className="relative min-h-screen text-white hero-section"
+                className="relative min-h-screen w-full text-white hero-section"
                 style={{
                     backgroundImage: `url('/red-cross-group.jpg')`,
                     backgroundPosition: 'center center',
@@ -61,8 +61,8 @@ const Home = () => {
                 <div className="absolute inset-0 bg-black/20"></div>
 
                 {/* Content */}
-                <div className="relative flex items-center min-h-screen">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+                <div className="relative flex items-center min-h-screen w-full">
+                    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                         <div className="text-center animate-fade-in">
                             <div className="mb-8 animate-float">
                                 <RedCrossSymbol size="2xl" animate={true} variant="circle" className="mx-auto" />
@@ -106,8 +106,8 @@ const Home = () => {
             </section>
 
             {/* Stats Section */}
-            <section className="py-16 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-16 bg-white w-full">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div className="text-center stats-card animate-fade-in">
                             <div className="w-16 h-16 bg-red-cross-100 rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-red-cross-200 transition-colors duration-300 animate-scale-in">
@@ -142,8 +142,8 @@ const Home = () => {
             </section>
 
             {/* Mission Section */}
-            <section className="py-16 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-16 bg-gray-50 w-full">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
@@ -197,8 +197,8 @@ const Home = () => {
             </section>
 
             {/* Upcoming Events */}
-            <section className="py-16 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-16 bg-white w-full">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900">Upcoming Events</h2>
                         <Link to="/events" className="btn btn-outline">
@@ -252,8 +252,8 @@ const Home = () => {
             </section>
 
             {/* Recent Announcements */}
-            <section className="py-16 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-16 bg-gray-50 w-full">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900">Latest Announcements</h2>
                         <Link to="/announcements" className="btn btn-outline">
@@ -308,8 +308,8 @@ const Home = () => {
             </section>
 
             {/* Call to Action */}
-            <section className="py-16 bg-red-cross-600 text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <section className="py-16 bg-red-cross-600 text-white w-full">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl font-bold mb-4">Ready to Make a Difference?</h2>
                     <p className="text-xl mb-8 max-w-2xl mx-auto">
                         Join thousands of students and community members who are already making an impact
