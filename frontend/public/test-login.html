@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - Haramaya Red Cross</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #b91c1c;
+        }
+
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔐 Test Login System</h1>
+        <p>This page tests the login functionality directly in the browser.</p>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="admin@haramaya.edu.et">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" value="admin123">
+        </div>
+
+        <button class="btn" onclick="testLogin()">🚀 Test Login</button>
+        <button class="btn" onclick="checkToken()">🔑 Check Token</button>
+        <button class="btn" onclick="clearStorage()">🗑️ Clear Storage</button>
+        <button class="btn" onclick="goToAdmin()">🏠 Go to Admin</button>
+
+        <div id="result" class="result info">
+            Click "Test Login" to test the authentication system.
+        </div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing login...';
+
+            try {
+                console.log('🔍 Starting login test...');
+                console.log('📧 Email:', email);
+                console.log('🔒 Password length:', password.length);
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const data = await response.json();
+                console.log('📋 Response data:', data);
+
+                if (response.ok && data.success && data.token) {
+                    localStorage.setItem('token', data.token);
+
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Login Successful!
+
+User: ${data.user.firstName} ${data.user.lastName}
+Email: ${data.user.email}
+Role: ${data.user.role}
+Active: ${data.user.isActive}
+Approved: ${data.user.isApproved}
+
+Token: ${data.token.substring(0, 50)}...
+Token stored in localStorage: ✅
+
+You can now access admin functions!`;
+
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Login Failed
+
+Status: ${response.status}
+Success: ${data.success}
+Message: ${data.message || 'Unknown error'}
+
+Full response: ${JSON.stringify(data, null, 2)}`;
+                }
+
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Network Error
+
+Error: ${error.message}
+
+This might indicate:
+- Backend server is not running
+- CORS issues
+- Network connectivity problems
+- Proxy configuration issues`;
+            }
+        }
+
+        async function checkToken() {
+            const resultDiv = document.getElementById('result');
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ No token found in localStorage\n\nPlease login first.';
+                return;
+            }
+
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Checking token validity...';
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Token Valid!
+
+User: ${data.user.firstName} ${data.user.lastName}
+Email: ${data.user.email}
+Role: ${data.user.role}
+Last Login: ${data.user.lastLogin ? new Date(data.user.lastLogin).toLocaleString() : 'N/A'}
+
+Token: ${token.substring(0, 50)}...
+
+Authentication is working correctly!`;
+
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Token Invalid
+
+Status: ${response.status}
+Message: ${data.message || 'Token expired or invalid'}
+
+Please login again.`;
+                    localStorage.removeItem('token');
+                }
+
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error checking token: ${error.message}`;
+            }
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('rememberedPassword');
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '🗑️ Storage cleared\n\nAll authentication data has been removed.';
+        }
+
+        function goToAdmin() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = '/admin';
+            } else {
+                alert('Please login first!');
+            }
+        }
+
+        // Auto-check token on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                checkToken();
+            }
+        });
+    </script>
+</body>
+
+</html>

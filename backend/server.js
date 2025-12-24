@@ -15,6 +15,8 @@ const donationRoutes = require('./routes/donations');
 const announcementRoutes = require('./routes/announcements');
 const branchRoutes = require('./routes/branches');
 const dashboardRoutes = require('./routes/dashboard');
+const galleryRoutes = require('./routes/gallery');
+const contactRoutes = require('./routes/contact');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -72,11 +74,11 @@ if (process.env.NODE_ENV === 'production') {
     app.use('/api/auth/register', authLimiter);
 }
 
-// CORS configuration
+// CORS configuration - Updated for multiple ports
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
         ? ['https://your-frontend-domain.com']
-        : ['http://localhost:3000'],
+        : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003'],
     credentials: true
 }));
 
@@ -128,6 +130,8 @@ app.use('/api/donations', donationRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check endpoint with system status
 app.get('/api/health', async (req, res) => {

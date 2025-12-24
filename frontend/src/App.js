@@ -15,6 +15,8 @@ import Events from './pages/public/Events';
 import EventDetail from './pages/public/EventDetail';
 import Announcements from './pages/public/Announcements';
 import AnnouncementDetail from './pages/public/AnnouncementDetail';
+import Gallery from './pages/public/Gallery';
+import Contact from './pages/public/Contact';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 
@@ -22,16 +24,21 @@ import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 import Profile from './pages/user/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import SimpleAdmin from './pages/SimpleAdmin';
+import DebugAuth from './pages/DebugAuth';
+import DirectAdmin from './pages/DirectAdmin';
 import UserManagement from './pages/admin/UserManagement';
 import EventManagement from './pages/admin/EventManagement';
 import DonationManagement from './pages/admin/DonationManagement';
 import AnnouncementManagement from './pages/admin/AnnouncementManagement';
+import GalleryManagement from './pages/admin/GalleryManagement';
+import ContactManagement from './pages/admin/ContactManagement';
 
 // Protected Route Component
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
-    const { loading } = useAuth();
+    const { loading, user } = useAuth();
 
     if (loading) {
         return (
@@ -49,10 +56,10 @@ function App() {
     return (
         <ErrorBoundary>
             <Router>
-                <div className="min-h-screen flex flex-col">
+                <div className={user ? "min-h-screen" : "min-h-screen flex flex-col"}>
                     <Navbar />
 
-                    <main className="flex-grow page-transition">
+                    <main className={user ? "ml-64 pt-20 page-transition" : "flex-grow page-transition"}>
                         <Routes>
                             {/* Public Routes */}
                             <Route path="/" element={<div className="animate-fade-in"><Home /></div>} />
@@ -61,6 +68,8 @@ function App() {
                             <Route path="/events/:id" element={<div className="animate-scale-in"><EventDetail /></div>} />
                             <Route path="/announcements" element={<div className="animate-fade-in"><Announcements /></div>} />
                             <Route path="/announcements/:id" element={<div className="animate-scale-in"><AnnouncementDetail /></div>} />
+                            <Route path="/gallery" element={<div className="animate-fade-in"><Gallery /></div>} />
+                            <Route path="/contact" element={<div className="animate-slide-up"><Contact /></div>} />
                             <Route path="/login" element={<div className="animate-slide-in-left"><Login /></div>} />
                             <Route path="/register" element={<div className="animate-slide-in-right"><Register /></div>} />
 
@@ -84,6 +93,15 @@ function App() {
                                 </ProtectedRoute>
                             } />
 
+                            {/* Simple Admin Route (bypass for testing) */}
+                            <Route path="/simple-admin" element={<SimpleAdmin />} />
+
+                            {/* Debug Auth Route (for troubleshooting) */}
+                            <Route path="/debug-auth" element={<DebugAuth />} />
+
+                            {/* Direct Admin Route (bypass authentication) */}
+                            <Route path="/direct-admin" element={<DirectAdmin />} />
+
                             <Route path="/admin/users" element={
                                 <ProtectedRoute roles={['admin', 'officer']}>
                                     <div className="animate-fade-in"><UserManagement /></div>
@@ -105,6 +123,18 @@ function App() {
                             <Route path="/admin/announcements" element={
                                 <ProtectedRoute roles={['admin', 'officer']}>
                                     <div className="animate-fade-in"><AnnouncementManagement /></div>
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/gallery/admin" element={
+                                <ProtectedRoute roles={['admin', 'officer']}>
+                                    <div className="animate-fade-in"><GalleryManagement /></div>
+                                </ProtectedRoute>
+                            } />
+
+                            <Route path="/contact/admin" element={
+                                <ProtectedRoute roles={['admin', 'officer']}>
+                                    <div className="animate-fade-in"><ContactManagement /></div>
                                 </ProtectedRoute>
                             } />
 

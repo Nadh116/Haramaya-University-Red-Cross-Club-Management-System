@@ -99,43 +99,82 @@ export const AuthProvider = ({ children }) => {
 
     // Load user on app start
     useEffect(() => {
+        console.log('🔍 AuthContext: useEffect triggered');
+        console.log('📊 Current state:', { token: state.token, loading: state.loading, user: state.user });
+
         if (state.token) {
+            console.log('🔑 Token found, loading user...');
             loadUser();
         } else {
+            console.log('❌ No token found, setting loading to false');
             dispatch({ type: AUTH_ACTIONS.LOAD_USER_FAILURE, payload: null });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Load user from token
     const loadUser = async () => {
+        console.log('👤 AuthContext: Loading user from token...');
         dispatch({ type: AUTH_ACTIONS.LOAD_USER_START });
 
         try {
+            console.log('📡 Making request to /auth/me...');
             const response = await api.get('/auth/me');
+            console.log('✅ User loaded successfully:', response.data.user);
+
             dispatch({
                 type: AUTH_ACTIONS.LOAD_USER_SUCCESS,
                 payload: response.data.user
             });
         } catch (error) {
+            console.error('❌ Failed to load user:', error);
+            console.error('❌ Error response:', error.response?.data);
+
+            const errorMessage = error.response?.data?.message || 'Failed to load user';
+            console.log('🗑️ Clearing invalid token...');
+
             dispatch({
                 type: AUTH_ACTIONS.LOAD_USER_FAILURE,
-                payload: error.response?.data?.message || 'Failed to load user'
+                payload: errorMessage
             });
         }
     };
 
     // Login
     const login = async (email, password) => {
+        console.log('🔍 AuthContext: Starting login process...');
+        console.log('📧 Email:', email);
         dispatch({ type: AUTH_ACTIONS.LOGIN_START });
 
         try {
+            console.log('📡 Making API call to /auth/login...');
             const response = await api.post('/auth/login', { email, password });
-            dispatch({
-                type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: response.data
-            });
-            return { success: true };
+            console.log('✅ Login API response:', response.data);
+
+            if (response.data.success && response.data.token && response.data.user) {
+                console.log('💾 Storing token in localStorage...');
+                localStorage.setItem('token', response.data.token);
+                console.log('🎉 Login successful, dispatching success action...');
+
+                dispatch({
+                    type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                    payload: response.data
+                });
+                return { success: true };
+            } else {
+                console.log('❌ Invalid response structure:', response.data);
+                const message = 'Invalid response from server';
+                dispatch({
+                    type: AUTH_ACTIONS.LOGIN_FAILURE,
+                    payload: message
+                });
+                return { success: false, error: message };
+            }
         } catch (error) {
+            console.error('❌ Login error:', error);
+            console.error('❌ Error response:', error.response?.data);
+            console.error('❌ Error status:', error.response?.status);
+
             const message = error.response?.data?.message || 'Login failed';
             dispatch({
                 type: AUTH_ACTIONS.LOGIN_FAILURE,

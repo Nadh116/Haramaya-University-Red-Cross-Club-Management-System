@@ -12,13 +12,20 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
     (config) => {
+        console.log('📡 API Request:', config.method?.toUpperCase(), config.url);
+        console.log('🔗 Full URL:', config.baseURL + config.url);
+
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('🔑 Token added to request');
+        } else {
+            console.log('⚠️ No token found in localStorage');
         }
         return config;
     },
     (error) => {
+        console.error('❌ Request interceptor error:', error);
         return Promise.reject(error);
     }
 );
@@ -26,11 +33,16 @@ api.interceptors.request.use(
 // Response interceptor to handle errors
 api.interceptors.response.use(
     (response) => {
+        console.log('✅ API Response:', response.status, response.config.url);
         return response;
     },
     (error) => {
+        console.error('❌ API Response Error:', error.response?.status, error.config?.url);
+        console.error('❌ Error details:', error.response?.data);
+
         // Handle 401 errors (unauthorized)
         if (error.response?.status === 401) {
+            console.log('🔓 Unauthorized - clearing token and redirecting to login');
             localStorage.removeItem('token');
             window.location.href = '/login';
         }
@@ -38,6 +50,7 @@ api.interceptors.response.use(
         // Handle network errors
         if (!error.response) {
             error.message = 'Network error. Please check your connection.';
+            console.error('🌐 Network error detected');
         }
 
         return Promise.reject(error);
@@ -121,6 +134,31 @@ export const dashboardAPI = {
     getStats: () => api.get('/dashboard/stats'),
     getActivities: (params) => api.get('/dashboard/activities', { params }),
     getPersonalDashboard: () => api.get('/dashboard/personal'),
+};
+
+export const galleryAPI = {
+    getImages: (params) => api.get('/gallery', { params }),
+    getImage: (id) => api.get(`/gallery/${id}`),
+    uploadImage: (formData) => api.post('/gallery', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
+    updateImage: (id, imageData) => api.put(`/gallery/${id}`, imageData),
+    deleteImage: (id) => api.delete(`/gallery/${id}`),
+    toggleLike: (id) => api.post(`/gallery/${id}/like`),
+    getFeaturedImages: (params) => api.get('/gallery/featured', { params }),
+    getStatistics: () => api.get('/gallery/statistics'),
+};
+
+export const contactAPI = {
+    submitForm: (contactData) => api.post('/contact', contactData),
+    getContacts: (params) => api.get('/contact', { params }),
+    getContact: (id) => api.get(`/contact/${id}`),
+    updateStatus: (id, statusData) => api.put(`/contact/${id}/status`, statusData),
+    addResponse: (id, responseData) => api.post(`/contact/${id}/response`, responseData),
+    deleteContact: (id) => api.delete(`/contact/${id}`),
+    getStatistics: () => api.get('/contact/statistics'),
 };
 
 export default api;

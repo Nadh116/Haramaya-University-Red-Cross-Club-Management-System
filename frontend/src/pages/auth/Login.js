@@ -56,22 +56,33 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('🔍 Login form submitted');
+        console.log('📧 Email:', formData.email);
+        console.log('🔒 Password length:', formData.password.length);
 
         // Save credentials to localStorage if remember me is checked
         if (rememberMe) {
             localStorage.setItem('rememberedEmail', formData.email);
             localStorage.setItem('rememberedPassword', formData.password);
+            console.log('💾 Credentials saved to localStorage');
         } else {
             // Clear saved credentials if remember me is unchecked
             localStorage.removeItem('rememberedEmail');
             localStorage.removeItem('rememberedPassword');
+            console.log('🗑️ Credentials cleared from localStorage');
         }
 
+        console.log('🚀 Calling login function...');
         const result = await login(formData.email, formData.password);
+        console.log('📋 Login result:', result);
 
         if (result.success) {
+            console.log('✅ Login successful, navigating...');
             const from = location.state?.from?.pathname || '/dashboard';
+            console.log('🧭 Navigating to:', from);
             navigate(from, { replace: true });
+        } else {
+            console.log('❌ Login failed:', result.error);
         }
     };
 
@@ -200,6 +211,42 @@ const Login = () => {
                                     Sign in
                                 </>
                             )}
+                        </button>
+                    </div>
+
+                    {/* Temporary Test Login Button */}
+                    <div className="mt-4">
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                console.log('🧪 Testing direct login...');
+                                try {
+                                    const response = await fetch('/api/auth/login', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            email: 'admin@haramaya.edu.et',
+                                            password: 'admin123'
+                                        })
+                                    });
+                                    const data = await response.json();
+                                    console.log('📋 Response:', data);
+
+                                    if (data.success && data.token) {
+                                        localStorage.setItem('token', data.token);
+                                        console.log('✅ Token stored, reloading...');
+                                        window.location.href = '/admin';
+                                    } else {
+                                        alert('Login failed: ' + (data.message || 'Unknown error'));
+                                    }
+                                } catch (error) {
+                                    console.error('❌ Error:', error);
+                                    alert('Network error: ' + error.message);
+                                }
+                            }}
+                            className="btn btn-secondary w-full flex justify-center py-2 text-sm"
+                        >
+                            🧪 Test Direct Login (Admin)
                         </button>
                     </div>
                 </form>

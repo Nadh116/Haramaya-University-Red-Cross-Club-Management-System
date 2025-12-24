@@ -1,4 +1,5 @@
 import React from 'react';
+import TeamSection from '../../components/common/TeamSection';
 
 const About = () => {
     return (
@@ -9,6 +10,62 @@ const About = () => {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         Dedicated to humanitarian service and community development across Haramaya University campuses
                     </p>
+                </div>
+
+                {/* Historical Background & Purpose */}
+                <div className="mb-16">
+                    <div className="card">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-4">Historical Background & Purpose</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            {/* Historical Background */}
+                            <div>
+                                <div className="flex items-center mb-6">
+                                    <div className="w-12 h-12 bg-red-cross-100 rounded-lg flex items-center justify-center mr-4">
+                                        <i className="fas fa-history text-red-cross-600 text-xl"></i>
+                                    </div>
+                                    <h3 className="text-2xl font-semibold text-gray-900">Historical Background</h3>
+                                </div>
+                                <p className="text-gray-600 mb-4">
+                                    The Haramaya University Red Cross Club (HURCC) was founded on September 23, 1999 E.C. at Haramaya University. It is a humanitarian, volunteer-based student organization that operates in alignment with the Ethiopian Red Cross Society (ERCS) principles.
+                                </p>
+                                <p className="text-gray-600">
+                                    Since its establishment, HURCC has been actively involved in life-saving services, awareness creation, and emergency response activities. The club has grown from a small group of committed students into a respected and active humanitarian organization serving both the university and surrounding communities.
+                                </p>
+                            </div>
+
+                            {/* Purpose */}
+                            <div>
+                                <div className="flex items-center mb-6">
+                                    <div className="w-12 h-12 bg-red-cross-100 rounded-lg flex items-center justify-center mr-4">
+                                        <i className="fas fa-target text-red-cross-600 text-xl"></i>
+                                    </div>
+                                    <h3 className="text-2xl font-semibold text-gray-900">Purpose</h3>
+                                </div>
+                                <p className="text-gray-600 mb-4">HURCC exists to:</p>
+                                <ul className="space-y-3 text-gray-600">
+                                    <li className="flex items-start">
+                                        <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                        <span>Mobilize university students for voluntary humanitarian activities</span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                        <span>Support vulnerable and at-risk communities</span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                        <span>Conduct blood donation campaigns</span>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                        <span>Respond effectively to emergencies</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
@@ -139,6 +196,67 @@ const About = () => {
                                     100+ Active Members
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Meet the Team Section */}
+                <TeamSection />
+
+                {/* Historical Background & Purpose */}
+                <div className="mb-16">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Historical Background & Purpose</h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                            Learn about our founding story and the humanitarian mission that drives us forward.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                        {/* Historical Background */}
+                        <div className="card">
+                            <div className="w-12 h-12 bg-red-cross-100 rounded-lg flex items-center justify-center mb-6">
+                                <i className="fas fa-history text-red-cross-600 text-xl"></i>
+                            </div>
+                            <h3 className="text-2xl font-semibold text-gray-900 mb-6">Historical Background</h3>
+                            <p className="text-gray-600 mb-4">
+                                The Haramaya University Red Cross Club (HURCC) was founded on September 23, 1999 E.C.
+                                at Haramaya University. It is a humanitarian, volunteer-based student organization that
+                                operates in alignment with the Ethiopian Red Cross Society (ERCS) principles.
+                            </p>
+                            <p className="text-gray-600">
+                                Since its establishment, HURCC has been actively involved in life-saving services,
+                                awareness creation, and emergency response activities. The club has grown from a small
+                                group of committed students into a respected and active humanitarian organization serving
+                                both the university and surrounding communities.
+                            </p>
+                        </div>
+
+                        {/* Purpose */}
+                        <div className="card">
+                            <div className="w-12 h-12 bg-red-cross-100 rounded-lg flex items-center justify-center mb-6">
+                                <i className="fas fa-target text-red-cross-600 text-xl"></i>
+                            </div>
+                            <h3 className="text-2xl font-semibold text-gray-900 mb-6">Purpose</h3>
+                            <p className="text-gray-600 mb-4">HURCC exists to:</p>
+                            <ul className="space-y-3 text-gray-600">
+                                <li className="flex items-start">
+                                    <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span>Mobilize university students for voluntary humanitarian activities</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span>Support vulnerable and at-risk communities</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span>Conduct blood donation campaigns</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <div className="w-2 h-2 bg-red-cross-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span>Respond effectively to emergencies</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

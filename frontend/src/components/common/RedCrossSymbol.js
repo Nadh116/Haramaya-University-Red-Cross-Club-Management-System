@@ -21,7 +21,7 @@ const RedCrossSymbol = ({
             <div className={`flex items-center justify-center ${className}`}>
                 <div className={`
                     red-cross-circle ${circularSizeClasses[size]}
-                    ${animate ? 'red-cross-logo animate-heartbeat' : ''}
+                    ${animate ? 'animate-gentle-pulse' : ''}
                 `}>
                 </div>
             </div>

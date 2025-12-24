@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Debug - Haramaya Red Cross</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #b91c1c;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔍 Authentication Debug Tool</h1>
+            <p>This tool helps diagnose authentication issues between frontend and backend.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🔐 Quick Login Test</h2>
+                <input type="email" id="email" placeholder="Email" value="admin@haramaya.edu.et">
+                <input type="password" id="password" placeholder="Password" value="admin123">
+                <button class="btn" onclick="testLogin()">🚀 Test Login</button>
+                <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+                <div id="loginResult" class="status info hidden">Ready to test...</div>
+            </div>
+
+            <div class="card">
+                <h2>🌐 Backend Health</h2>
+                <button class="btn btn-secondary" onclick="testBackend()">Check Backend</button>
+                <button class="btn btn-secondary" onclick="testCORS()">Test CORS</button>
+                <div id="backendResult" class="status info hidden">Click to test backend...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔑 Token Management</h2>
+            <button class="btn btn-secondary" onclick="checkToken()">Check Current Token</button>
+            <button class="btn btn-secondary" onclick="validateToken()">Validate with Backend</button>
+            <button class="btn btn-secondary" onclick="clearToken()">Clear Token</button>
+            <div id="tokenResult" class="status info hidden">Click to check token...</div>
+        </div>
+
+        <div class="card">
+            <h2>🧭 Navigation Tests</h2>
+            <button class="btn" onclick="goToReactLogin()">React Login Page</button>
+            <button class="btn" onclick="goToReactAdmin()">React Admin</button>
+            <button class="btn" onclick="goToDirectAdmin()">Direct Admin</button>
+            <button class="btn btn-secondary" onclick="testReactApp()">Test React App</button>
+            <div id="navResult" class="status info hidden">Navigation results...</div>
+        </div>
+
+        <div class="card">
+            <h2>📊 System Information</h2>
+            <div id="systemInfo" class="status info">Loading system info...</div>
+        </div>
+
+        <div class="card">
+            <h2>📝 Debug Log</h2>
+            <button class="btn btn-secondary" onclick="clearLog()">Clear Log</button>
+            <div id="debugLog" class="status info log">Debug log will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        let logEntries = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = `[${timestamp}] ${message}`;
+            logEntries.push(entry);
+
+            const logDiv = document.getElementById('debugLog');
+            logDiv.className = `status ${type} log`;
+            logDiv.textContent = logEntries.join('\n');
+            logDiv.scrollTop = logDiv.scrollHeight;
+
+            console.log(entry);
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+
+            log('🔍 Starting login test...', 'info');
+            log(`📧 Email: ${email}`, 'info');
+
+            resultDiv.className = 'status info';
+            resultDiv.textContent = 'Testing login...';
+            resultDiv.classList.remove('hidden');
+
+            try {
+                log('📡 Making login request to /api/auth/login', 'info');
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                log(`📊 Response status: ${response.status}`, 'info');
+                log(`📊 Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`, 'info');
+
+                const data = await response.json();
+                log(`📋 Response data: ${JSON.stringify(data, null, 2)}`, 'info');
+
+                if (response.ok && data.success && data.token) {
+                    localStorage.setItem('token', data.token);
+                    log('✅ Login successful, token stored', 'success');
+
+                    resultDiv.className = 'status success';
+                    resultDiv.textContent = `✅ Login Successful!
+
+User: ${data.user.firstName} ${data.user.lastName}
+Email: ${data.user.email}
+Role: ${data.user.role}
+Active: ${data.user.isActive}
+Approved: ${data.user.isApproved}
+
+Token: ${data.token.substring(0, 50)}...
+Stored in localStorage: ✅`;
+
+                } else {
+                    log(`❌ Login failed: ${data.message || 'Unknown error'}`, 'error');
+
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = `❌ Login Failed
+
+Status: ${response.status}
+Success: ${data.success}
+Message: ${data.message || 'Unknown error'}
+
+Full Response:
+${JSON.stringify(data, null, 2)}`;
+                }
+
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Network Error: ${error.message}
+
+This could indicate:
+- Backend server not running on port 5000
+- CORS configuration issues
+- Network connectivity problems
+- Proxy configuration issues`;
+            }
+        }
+
+        async function testBackend() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.classList.remove('hidden');
+
+            log('🏥 Testing backend health...', 'info');
+
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+
+                log(`✅ Backend health check successful`, 'success');
+                log(`📊 Backend status: ${JSON.stringify(data, null, 2)}`, 'info');
+
+                resultDiv.className = 'status success';
+                resultDiv.textContent = `✅ Backend Healthy
+
+Status: ${response.status}
+Message: ${data.message}
+Environment: ${data.environment}
+Database: ${data.status?.database}
+Uptime: ${data.status?.uptime}
+Memory: ${data.status?.memory?.used}/${data.status?.memory?.total}`;
+
+            } catch (error) {
+                log(`❌ Backend health check failed: ${error.message}`, 'error');
+
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Backend Unreachable: ${error.message}
+
+Possible issues:
+- Backend server not running
+- Wrong port (should be 5000)
+- Network issues`;
+            }
+        }
+
+        async function testCORS() {
+            const resultDiv = document.getElementById('backendResult');
+
+            log('🌐 Testing CORS configuration...', 'info');
+
+            try {
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+                };
+
+                log(`🌐 CORS headers: ${JSON.stringify(corsHeaders, null, 2)}`, 'info');
+
+                resultDiv.className = 'status info';
+                resultDiv.textContent = `🌐 CORS Configuration
+
+Current Origin: ${window.location.origin}
+CORS Headers:
+${JSON.stringify(corsHeaders, null, 2)}
+
+Status: ${response.status}`;
+
+            } catch (error) {
+                log(`❌ CORS test failed: ${error.message}`, 'error');
+
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ CORS Test Failed: ${error.message}`;
+            }
+        }
+
+        async function checkToken() {
+            const resultDiv = document.getElementById('tokenResult');
+            resultDiv.classList.remove('hidden');
+
+            const token = localStorage.getItem('token');
+
+            log('🔑 Checking stored token...', 'info');
+
+            if (!token) {
+                log('❌ No token found in localStorage', 'warning');
+
+                resultDiv.className = 'status warning';
+                resultDiv.textContent = '❌ No token found in localStorage\n\nPlease login first.';
+                return;
+            }
+
+            log(`✅ Token found: ${token.substring(0, 50)}...`, 'info');
+
+            resultDiv.className = 'status success';
+            resultDiv.textContent = `✅ Token Found
+
+Length: ${token.length} characters
+Preview: ${token.substring(0, 100)}...
+
+Stored at: ${new Date().toLocaleString()}
+Origin: localStorage`;
+        }
+
+        async function validateToken() {
+            const resultDiv = document.getElementById('tokenResult');
+            resultDiv.classList.remove('hidden');
+
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                resultDiv.className = 'status error';
+                resultDiv.textContent = '❌ No token to validate';
+                return;
+            }
+
+            log('🔍 Validating token with backend...', 'info');
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    log('✅ Token validation successful', 'success');
+                    log(`👤 User data: ${JSON.stringify(data.user, null, 2)}`, 'info');
+
+                    resultDiv.className = 'status success';
+                    resultDiv.textContent = `✅ Token Valid!
+
+User: ${data.user.firstName} ${data.user.lastName}
+Email: ${data.user.email}
+Role: ${data.user.role}
+Active: ${data.user.isActive}
+Approved: ${data.user.isApproved}
+Last Login: ${data.user.lastLogin ? new Date(data.user.lastLogin).toLocaleString() : 'N/A'}
+
+Token is working correctly!`;
+
+                } else {
+                    log(`❌ Token validation failed: ${data.message}`, 'error');
+
+                    resultDiv.className = 'status error';
+                    resultDiv.textContent = `❌ Token Invalid
+
+Status: ${response.status}
+Message: ${data.message || 'Token expired or invalid'}
+
+Please login again.`;
+
+                    localStorage.removeItem('token');
+                }
+
+            } catch (error) {
+                log(`❌ Token validation error: ${error.message}`, 'error');
+
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ Validation Error: ${error.message}`;
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('token');
+            log('🗑️ Token cleared from localStorage', 'info');
+
+            const resultDiv = document.getElementById('tokenResult');
+            resultDiv.className = 'status info';
+            resultDiv.textContent = '🗑️ Token cleared from localStorage';
+            resultDiv.classList.remove('hidden');
+        }
+
+        function clearAll() {
+            localStorage.clear();
+            log('🗑️ All localStorage data cleared', 'info');
+
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.className = 'status info';
+            resultDiv.textContent = '🗑️ All data cleared';
+            resultDiv.classList.remove('hidden');
+        }
+
+        function goToReactLogin() {
+            log('🧭 Navigating to React login page...', 'info');
+            window.open('/login', '_blank');
+        }
+
+        function goToReactAdmin() {
+            log('🧭 Navigating to React admin page...', 'info');
+            window.open('/admin', '_blank');
+        }
+
+        function goToDirectAdmin() {
+            log('🧭 Navigating to direct admin page...', 'info');
+            window.open('/admin-direct.html', '_blank');
+        }
+
+        async function testReactApp() {
+            const resultDiv = document.getElementById('navResult');
+            resultDiv.classList.remove('hidden');
+
+            log('⚛️ Testing React app accessibility...', 'info');
+
+            try {
+                const response = await fetch('/');
+                const html = await response.text();
+
+                const hasReact = html.includes('react') || html.includes('React');
+                const hasRoot = html.includes('id="root"');
+
+                log(`⚛️ React app test - Has React: ${hasReact}, Has Root: ${hasRoot}`, 'info');
+
+                resultDiv.className = 'status success';
+                resultDiv.textContent = `⚛️ React App Status
+
+Response Status: ${response.status}
+Has React References: ${hasReact ? '✅' : '❌'}
+Has Root Element: ${hasRoot ? '✅' : '❌'}
+Content Length: ${html.length} characters
+
+React app appears to be ${hasRoot ? 'properly configured' : 'missing or misconfigured'}`;
+
+            } catch (error) {
+                log(`❌ React app test failed: ${error.message}`, 'error');
+
+                resultDiv.className = 'status error';
+                resultDiv.textContent = `❌ React App Test Failed: ${error.message}`;
+            }
+        }
+
+        function clearLog() {
+            logEntries = [];
+            document.getElementById('debugLog').textContent = 'Debug log cleared...';
+        }
+
+        function updateSystemInfo() {
+            const info = {
+                'Current URL': window.location.href,
+                'Origin': window.location.origin,
+                'User Agent': navigator.userAgent,
+                'Local Storage Items': Object.keys(localStorage).length,
+                'Session Storage Items': Object.keys(sessionStorage).length,
+                'Cookies Enabled': navigator.cookieEnabled,
+                'Online Status': navigator.onLine,
+                'Timestamp': new Date().toLocaleString()
+            };
+
+            const systemDiv = document.getElementById('systemInfo');
+            systemDiv.textContent = Object.entries(info)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            updateSystemInfo();
+            log('🚀 Debug tool initialized', 'info');
+
+            // Auto-check token if present
+            if (localStorage.getItem('token')) {
+                log('🔑 Found existing token, validating...', 'info');
+                setTimeout(validateToken, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>
