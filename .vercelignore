@@ -1,0 +1,16 @@
+backend/
+node_modules/
+*.log
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+test-*
+debug-*
+*.ps1
+*.md
+!README.md
+.kiro/
+.vscode/
+.git/

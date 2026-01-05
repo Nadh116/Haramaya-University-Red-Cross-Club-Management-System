@@ -1,0 +1,31 @@
+{
+    "name": "haramaya-redcross-system",
+    "version": "1.0.0",
+    "description": "Haramaya University Red Cross Club Management System",
+    "private": true,
+    "scripts": {
+        "build": "cd frontend && npm install && npm run build",
+        "start": "cd frontend && npm start",
+        "install-frontend": "cd frontend && npm install",
+        "install-backend": "cd backend && npm install",
+        "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
+        "postinstall": "npm run install-frontend"
+    },
+    "workspaces": [
+        "frontend",
+        "backend"
+    ],
+    "devDependencies": {
+        "concurrently": "^7.6.0"
+    },
+    "engines": {
+        "node": ">=16.0.0",
+        "npm": ">=8.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Nadh116/Haramaya-University-Red-Cross-Club-Management-System.git"
+    },
+    "author": "Nadhi Jemal",
+    "license": "MIT"
+}
