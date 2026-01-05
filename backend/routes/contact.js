@@ -24,8 +24,8 @@ const contactValidation = [
         .withMessage('Please provide a valid email address'),
     body('phone')
         .optional()
-        .isMobilePhone()
-        .withMessage('Please provide a valid phone number'),
+        .isLength({ min: 0, max: 20 })
+        .withMessage('Phone number must be less than 20 characters'),
     body('subject')
         .trim()
         .isLength({ min: 5, max: 200 })

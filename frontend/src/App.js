@@ -6,6 +6,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Layout Components
 import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
 
 // Public Pages
@@ -152,6 +153,9 @@ function App() {
                             } />
                         </Routes>
                     </main>
+
+                    {/* Footer - appears on all pages */}
+                    <Footer />
                 </div>
             </Router>
         </ErrorBoundary>

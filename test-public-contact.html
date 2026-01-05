@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Contact Form Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9fafb;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ef4444;
+        }
+
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #dc2626; margin-bottom: 10px;">🏥 Haramaya University Red Cross Club</h1>
+            <h2 style="color: #374151; margin-bottom: 20px;">Public Contact Form</h2>
+            <p style="color: #6b7280;">Send a message to our admin team - no login required!</p>
+        </div>
+
+        <div class="info">
+            <h3>📋 How This Works:</h3>
+            <ol>
+                <li><strong>Public Access:</strong> Anyone can fill out this form</li>
+                <li><strong>No Login Required:</strong> Visitors don't need accounts</li>
+                <li><strong>Direct to Admin:</strong> Messages go straight to admin dashboard</li>
+                <li><strong>Admin Response:</strong> Admins can reply via email</li>
+            </ol>
+        </div>
+
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="inquiryType">What can we help you with? *</label>
+                <select id="inquiryType" name="inquiryType" required>
+                    <option value="general">General Information</option>
+                    <option value="volunteer">Volunteer Opportunities</option>
+                    <option value="emergency">Emergency Assistance</option>
+                    <option value="donation">Blood Donation</option>
+                    <option value="training">Training Programs</option>
+                    <option value="partnership">Partnership</option>
+                </select>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="name">Your Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+251911234567">
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject *</label>
+                    <input type="text" id="subject" name="subject" placeholder="Brief subject of your message" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Your Message *</label>
+                <textarea id="message" name="message" rows="5" placeholder="Please describe how we can help you..."
+                    required></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span id="btnText">📧 Send Message to Admin</span>
+                <span id="btnLoading" style="display: none;">
+                    <div class="loading"></div> Sending...
+                </span>
+            </button>
+        </form>
+
+        <div id="result"></div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center;">
+            <h3 style="color: #374151; margin-bottom: 15px;">Other Ways to Reach Us</h3>
+            <div class="grid" style="text-align: center;">
+                <div>
+                    <p style="font-weight: 600; color: #dc2626;">📧 Email</p>
+                    <p style="color: #6b7280;">info@haramayaredcross.org</p>
+                </div>
+                <div>
+                    <p style="font-weight: 600; color: #dc2626;">📞 Phone</p>
+                    <p style="color: #6b7280;">+251-25-553-0011</p>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <p style="font-weight: 600; color: #dc2626;">🚨 Emergency Hotline</p>
+                <p style="color: #6b7280;">+251-91-123-4567 (24/7)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            const result = document.getElementById('result');
+
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-flex';
+            result.innerHTML = '';
+
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                inquiryType: document.getElementById('inquiryType').value
+            };
+
+            console.log('🚀 Submitting public contact form...');
+            console.log('📋 Form data:', formData);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('📡 Response status:', response.status);
+                const data = await response.json();
+                console.log('📄 Response data:', data);
+
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Message Sent Successfully!</h4>
+                            <p><strong>Contact ID:</strong> ${data.data.contactId}</p>
+                            <p><strong>Submitted:</strong> ${new Date(data.data.submittedAt).toLocaleString()}</p>
+                            <p><strong>What happens next:</strong></p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Your message is now in the admin dashboard</li>
+                                <li>An admin will review it within 24-48 hours</li>
+                                <li>You'll receive a response via email</li>
+                                <li>For urgent matters, call our emergency hotline</li>
+                            </ul>
+                        </div>
+                    `;
+
+                    // Reset form
+                    document.getElementById('contactForm').reset();
+                    console.log('✅ Contact form submitted successfully!');
+                } else {
+                    console.error('❌ Server error:', data);
+                    result.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Error Sending Message</h4>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>Error:</strong> ${data.message || 'Unknown error occurred'}</p>
+                            <p>Please try again or contact us directly at info@haramayaredcross.org</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Network error:', error);
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Possible causes:</strong></p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Backend server is not running</li>
+                            <li>Network connection issues</li>
+                            <li>CORS configuration problems</li>
+                        </ul>
+                        <p>Please try again later or contact us directly.</p>
+                    </div>
+                `;
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        });
+
+        // Add some sample data for testing
+        document.getElementById('name').value = 'John Doe';
+        document.getElementById('email').value = 'john.doe@example.com';
+        document.getElementById('phone').value = '+251911234567';
+        document.getElementById('subject').value = 'Volunteer Inquiry';
+        document.getElementById('message').value = 'Hello, I am interested in volunteering with the Red Cross. Could you please provide more information about available opportunities?';
+    </script>
+</body>
+
+</html>

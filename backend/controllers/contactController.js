@@ -4,7 +4,7 @@ const { validationResult } = require('express-validator');
 
 // Configure email transporter (you'll need to set up your email service)
 const createEmailTransporter = () => {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
         port: process.env.SMTP_PORT || 587,
         secure: false,
@@ -18,15 +18,27 @@ const createEmailTransporter = () => {
 // Submit contact form
 const submitContactForm = async (req, res) => {
     try {
+        // Log incoming request details
+        console.log('🔍 === CONTACT FORM SUBMISSION DEBUG ===');
+        console.log('📋 Request Body:', JSON.stringify(req.body, null, 2));
+        console.log('📋 Request Headers:', req.headers);
+        console.log('📋 Request Method:', req.method);
+        console.log('📋 Request URL:', req.url);
+
         // Check for validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log('❌ VALIDATION ERRORS DETECTED:');
+            console.log(JSON.stringify(errors.array(), null, 2));
+
             return res.status(400).json({
                 success: false,
                 message: 'Validation errors',
                 errors: errors.array()
             });
         }
+
+        console.log('✅ Validation passed, processing contact form...');
 
         const {
             name,
@@ -60,20 +72,28 @@ const submitContactForm = async (req, res) => {
 
         await contact.save();
 
-        // Send confirmation email to user
-        try {
-            await sendConfirmationEmail(contact);
-        } catch (emailError) {
-            console.error('Error sending confirmation email:', emailError);
-            // Don't fail the request if email fails
-        }
+        // Send emails asynchronously without blocking the response
+        setImmediate(async () => {
+            // Send confirmation email to user
+            try {
+                await Promise.race([
+                    sendConfirmationEmail(contact),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 5000))
+                ]);
+            } catch (emailError) {
+                console.error('Error sending confirmation email:', emailError.message);
+            }
 
-        // Send notification email to admin
-        try {
-            await sendAdminNotification(contact);
-        } catch (emailError) {
-            console.error('Error sending admin notification:', emailError);
-        }
+            // Send notification email to admin
+            try {
+                await Promise.race([
+                    sendAdminNotification(contact),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 5000))
+                ]);
+            } catch (emailError) {
+                console.error('Error sending admin notification:', emailError.message);
+            }
+        });
 
         res.status(201).json({
             success: true,
@@ -429,34 +449,81 @@ const sendResponseEmail = async (contact, responseMessage, respondedBy) => {
     const transporter = createEmailTransporter();
 
     const mailOptions = {
-        from: process.env.FROM_EMAIL || 'noreply@haramayaredcross.org',
+        from: `"Haramaya Red Cross Club" <${process.env.FROM_EMAIL || 'noreply@haramayaredcross.org'}>`,
         to: contact.email,
-        subject: `Response to your inquiry: ${contact.subject}`,
+        subject: `Response to Your Inquiry – Haramaya Red Cross Club`,
         html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-                    <h1>Haramaya University Red Cross Club</h1>
-                </div>
-                <div style="padding: 20px;">
-                    <h2>Response to your inquiry</h2>
-                    <p>Dear ${contact.name},</p>
-                    
-                    <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                        <p>${responseMessage}</p>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Response from Haramaya Red Cross Club</title>
+            </head>
+            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <div style="background-color: #dc2626; color: white; padding: 30px 20px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 24px; font-weight: bold;">🏥 Haramaya University Red Cross Club</h1>
+                        <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Serving Humanity with Compassion</p>
                     </div>
                     
-                    <p>Responded by: ${respondedBy.firstName} ${respondedBy.lastName}</p>
+                    <!-- Content -->
+                    <div style="padding: 30px 20px;">
+                        <h2 style="color: #374151; margin: 0 0 20px 0; font-size: 20px;">Response to Your Inquiry</h2>
+                        
+                        <p style="color: #374151; margin: 0 0 20px 0; font-size: 16px;">Dear ${contact.name},</p>
+                        
+                        <p style="color: #6b7280; margin: 0 0 25px 0; font-size: 14px;">
+                            Thank you for contacting us regarding "<strong>${contact.subject}</strong>". 
+                            We have reviewed your message and are pleased to provide the following response:
+                        </p>
+                        
+                        <!-- Response Message -->
+                        <div style="background-color: #f8fafc; border-left: 4px solid #dc2626; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                            <div style="color: #374151; font-size: 16px; line-height: 1.6;">
+                                ${responseMessage.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #dc2626; margin: 0 0 15px 0; font-size: 16px;">Need Further Assistance?</h3>
+                            <div style="color: #374151; font-size: 14px; line-height: 1.6;">
+                                <p style="margin: 0 0 8px 0;"><strong>📧 Email:</strong> info@haramayaredcross.org</p>
+                                <p style="margin: 0 0 8px 0;"><strong>📞 Phone:</strong> +251-25-553-0011</p>
+                                <p style="margin: 0 0 8px 0;"><strong>🚨 Emergency:</strong> +251-91-123-4567 (24/7)</p>
+                                <p style="margin: 0;"><strong>🏢 Office:</strong> Student Affairs Building, Room 205, Haramaya University</p>
+                            </div>
+                        </div>
+                        
+                        <p style="color: #6b7280; margin: 25px 0 0 0; font-size: 14px;">
+                            Best regards,<br>
+                            <strong>${respondedBy.firstName} ${respondedBy.lastName}</strong><br>
+                            Haramaya University Red Cross Club
+                        </p>
+                    </div>
                     
-                    <p>If you have any further questions, please don't hesitate to contact us.</p>
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                        <p><strong>Reference ID:</strong> ${contact._id}</p>
-                        <p style="color: #6b7280; font-size: 14px;">
-                            This message was sent in response to your inquiry submitted on ${contact.createdAt.toLocaleDateString()}.
+                    <!-- Footer -->
+                    <div style="background-color: #f9fafb; padding: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                        <p style="color: #9ca3af; font-size: 12px; margin: 0 0 10px 0;">
+                            <strong>Reference ID:</strong> ${contact._id}
+                        </p>
+                        <p style="color: #9ca3af; font-size: 12px; margin: 0 0 10px 0;">
+                            Original inquiry submitted on ${contact.createdAt.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })}
+                        </p>
+                        <p style="color: #9ca3af; font-size: 11px; margin: 0;">
+                            This is an automated response from Haramaya University Red Cross Club. 
+                            Please do not reply directly to this email.
                         </p>
                     </div>
                 </div>
-            </div>
+            </body>
+            </html>
         `
     };
 

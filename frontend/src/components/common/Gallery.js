@@ -34,7 +34,7 @@ const Gallery = () => {
                 console.log('🔍 Sample image URLs:', response.data.data.images.slice(0, 2).map(img => ({
                     title: img.title,
                     imageUrl: img.imageUrl,
-                    fullUrl: `http://localhost:5000${img.imageUrl}`
+                    fullUrl: img.imageUrl
                 })));
             } else {
                 console.log('⚠️ No images in response, using fallback');
@@ -194,11 +194,11 @@ const Gallery = () => {
                             {/* Real image or placeholder */}
                             {image.imageUrl ? (
                                 <img
-                                    src={`http://localhost:5000${image.imageUrl}`}
+                                    src={image.imageUrl}
                                     alt={image.seoData?.altText || image.title}
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
-                                        console.error('❌ Image failed to load:', `http://localhost:5000${image.imageUrl}`);
+                                        console.error('❌ Image failed to load:', image.imageUrl);
                                         // Fallback to placeholder if image fails to load
                                         e.target.style.display = 'none';
                                         e.target.nextSibling.style.display = 'flex';
@@ -276,11 +276,11 @@ const Gallery = () => {
                             {/* Real image or placeholder */}
                             {selectedImage.imageUrl ? (
                                 <img
-                                    src={`http://localhost:5000${selectedImage.imageUrl}`}
+                                    src={selectedImage.imageUrl}
                                     alt={selectedImage.seoData?.altText || selectedImage.title}
                                     className="w-full h-96 object-cover"
                                     onError={(e) => {
-                                        console.error('❌ Modal image failed to load:', `http://localhost:5000${selectedImage.imageUrl}`);
+                                        console.error('❌ Modal image failed to load:', selectedImage.imageUrl);
                                         // Fallback to placeholder if image fails to load
                                         e.target.style.display = 'none';
                                         e.target.nextSibling.style.display = 'flex';

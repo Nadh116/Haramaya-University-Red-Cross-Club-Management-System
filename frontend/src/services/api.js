@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Create axios instance
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || '/api',
+    baseURL: process.env.NODE_ENV === 'production'
+        ? process.env.REACT_APP_API_URL || '/api'
+        : '/api', // Use proxy in development
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -15,13 +17,25 @@ api.interceptors.request.use(
         console.log('📡 API Request:', config.method?.toUpperCase(), config.url);
         console.log('🔗 Full URL:', config.baseURL + config.url);
 
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-            console.log('🔑 Token added to request');
+        // Don't add auth token for public endpoints
+        const publicEndpoints = [];
+        const isPublicContactSubmission = config.url === '/contact' && config.method?.toLowerCase() === 'post';
+        const isPublicEndpoint = publicEndpoints.some(endpoint =>
+            config.url === endpoint || config.url?.startsWith(endpoint + '?')
+        ) || isPublicContactSubmission;
+
+        if (!isPublicEndpoint) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+                console.log('🔑 Token added to request');
+            } else {
+                console.log('⚠️ No token found in localStorage');
+            }
         } else {
-            console.log('⚠️ No token found in localStorage');
+            console.log('🌐 Public endpoint - no auth token needed');
         }
+
         return config;
     },
     (error) => {
@@ -40,11 +54,27 @@ api.interceptors.response.use(
         console.error('❌ API Response Error:', error.response?.status, error.config?.url);
         console.error('❌ Error details:', error.response?.data);
 
-        // Handle 401 errors (unauthorized)
+        // Handle 401 errors (unauthorized) - but be more selective
         if (error.response?.status === 401) {
-            console.log('🔓 Unauthorized - clearing token and redirecting to login');
-            localStorage.removeItem('token');
-            window.location.href = '/login';
+            console.log('🔓 Unauthorized error detected');
+
+            // Only redirect to login for auth-related endpoints or if it's a token verification failure
+            const isAuthEndpoint = error.config?.url?.includes('/auth/');
+            const isTokenExpired = error.response?.data?.message?.includes('token') ||
+                error.response?.data?.message?.includes('expired') ||
+                error.response?.data?.message?.includes('invalid');
+
+            if (isAuthEndpoint || isTokenExpired) {
+                console.log('🗑️ Clearing token and redirecting to login');
+                localStorage.removeItem('token');
+
+                // Use React Router navigation instead of window.location
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
+            } else {
+                console.log('⚠️ 401 error but not redirecting - might be role/permission issue');
+            }
         }
 
         // Handle network errors

@@ -57,6 +57,10 @@ const ContactManagement = () => {
     const fetchContacts = async (page = 1) => {
         try {
             setLoading(true);
+            console.log('📡 ContactManagement: Fetching contacts...');
+            console.log('🔑 Current token:', localStorage.getItem('token') ? 'Present' : 'Missing');
+            console.log('👤 Current user:', user);
+
             const params = {
                 page,
                 limit: 20,
@@ -67,10 +71,25 @@ const ContactManagement = () => {
             };
 
             const response = await contactAPI.getContacts(params);
+            console.log('✅ Contacts fetched successfully:', response.data.data.contacts.length, 'contacts');
             setContacts(response.data.data.contacts);
             setPagination(response.data.data.pagination);
         } catch (error) {
-            console.error('Error fetching contacts:', error);
+            console.error('❌ Error fetching contacts:', error);
+            console.error('❌ Error response:', error.response?.data);
+
+            // Handle specific error cases
+            if (error.response?.status === 401) {
+                console.log('🔓 Authentication error in fetchContacts');
+                // Don't redirect here - let the user know what happened
+                alert('Authentication error. Please check your login status and try again.');
+            } else if (error.response?.status === 403) {
+                console.log('🚫 Permission error in fetchContacts');
+                alert('You do not have permission to access contact management. Please contact an administrator.');
+            } else {
+                console.log('🌐 Network or server error in fetchContacts');
+                alert('Error loading contacts. Please try again later.');
+            }
         } finally {
             setLoading(false);
         }
@@ -336,7 +355,15 @@ const ContactManagement = () => {
                                                 <select
                                                     value={contact.status}
                                                     onChange={(e) => handleStatusUpdate(contact._id, e.target.value)}
-                                                    className={`px-2 py-1 text-xs font-medium rounded-full border-0 focus:ring-2 focus:ring-red-cross-500 bg-${getStatusColor(contact.status)}-100 text-${getStatusColor(contact.status)}-800`}
+                                                    className="px-2 py-1 text-xs font-medium rounded-full border border-gray-300 focus:ring-2 focus:ring-red-cross-500 focus:border-transparent"
+                                                    style={{
+                                                        backgroundColor: getStatusColor(contact.status) === 'blue' ? '#dbeafe' :
+                                                            getStatusColor(contact.status) === 'yellow' ? '#fef3c7' :
+                                                                getStatusColor(contact.status) === 'green' ? '#d1fae5' : '#f3f4f6',
+                                                        color: getStatusColor(contact.status) === 'blue' ? '#1e40af' :
+                                                            getStatusColor(contact.status) === 'yellow' ? '#92400e' :
+                                                                getStatusColor(contact.status) === 'green' ? '#065f46' : '#374151'
+                                                    }}
                                                 >
                                                     {statusOptions.slice(1).map(status => (
                                                         <option key={status.value} value={status.value}>{status.label}</option>
@@ -347,7 +374,17 @@ const ContactManagement = () => {
                                                 <select
                                                     value={contact.priority}
                                                     onChange={(e) => handlePriorityUpdate(contact._id, e.target.value)}
-                                                    className={`px-2 py-1 text-xs font-medium rounded-full border-0 focus:ring-2 focus:ring-red-cross-500 bg-${getPriorityColor(contact.priority)}-100 text-${getPriorityColor(contact.priority)}-800`}
+                                                    className="px-2 py-1 text-xs font-medium rounded-full border border-gray-300 focus:ring-2 focus:ring-red-cross-500 focus:border-transparent"
+                                                    style={{
+                                                        backgroundColor: getPriorityColor(contact.priority) === 'green' ? '#d1fae5' :
+                                                            getPriorityColor(contact.priority) === 'yellow' ? '#fef3c7' :
+                                                                getPriorityColor(contact.priority) === 'orange' ? '#fed7aa' :
+                                                                    getPriorityColor(contact.priority) === 'red' ? '#fecaca' : '#f3f4f6',
+                                                        color: getPriorityColor(contact.priority) === 'green' ? '#065f46' :
+                                                            getPriorityColor(contact.priority) === 'yellow' ? '#92400e' :
+                                                                getPriorityColor(contact.priority) === 'orange' ? '#9a3412' :
+                                                                    getPriorityColor(contact.priority) === 'red' ? '#991b1b' : '#374151'
+                                                    }}
                                                 >
                                                     {priorityOptions.slice(1).map(priority => (
                                                         <option key={priority.value} value={priority.value}>{priority.label}</option>

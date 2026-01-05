@@ -151,52 +151,6 @@ const Navbar = () => {
                             </>
                         )}
                     </nav>
-
-                    {/* User Profile Section */}
-                    <div className="p-4 border-t border-gray-700">
-                        <div className="relative" ref={profileRef}>
-                            <button
-                                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-200"
-                            >
-                                <div className="w-8 h-8 bg-gradient-to-br from-red-cross-500 to-red-cross-600 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-semibold text-sm">
-                                        {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-                                    </span>
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <div className="text-sm font-medium text-white">
-                                        {user.firstName} {user.lastName}
-                                    </div>
-                                    <div className="text-xs text-gray-400 capitalize">
-                                        {user.role}
-                                    </div>
-                                </div>
-                                <i className={`fas fa-chevron-up text-gray-400 text-xs transition-transform duration-200 ${isProfileOpen ? 'transform rotate-180' : ''}`}></i>
-                            </button>
-
-                            {/* Profile Dropdown */}
-                            {isProfileOpen && (
-                                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-fade-in">
-                                    <Link
-                                        to="/profile"
-                                        className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                        onClick={() => setIsProfileOpen(false)}
-                                    >
-                                        <i className="fas fa-user w-4 text-center"></i>
-                                        <span>My Profile</span>
-                                    </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                    >
-                                        <i className="fas fa-sign-out-alt w-4 text-center"></i>
-                                        <span>Sign Out</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Fixed Top Header */}
@@ -218,11 +172,48 @@ const Navbar = () => {
                                 </span>
                             </button>
 
-                            {/* User Avatar */}
-                            <div className="w-8 h-8 bg-gradient-to-br from-red-cross-500 to-red-cross-600 rounded-full flex items-center justify-center">
-                                <span className="text-white font-semibold text-sm">
-                                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
-                                </span>
+                            {/* User Profile Dropdown */}
+                            <div className="relative" ref={profileRef}>
+                                <button
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+                                >
+                                    <div className="w-8 h-8 bg-gradient-to-br from-red-cross-500 to-red-cross-600 rounded-full flex items-center justify-center">
+                                        <span className="text-white font-semibold text-sm">
+                                            {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                                        </span>
+                                    </div>
+                                    <div className="hidden md:block text-left">
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {user.firstName} {user.lastName}
+                                        </div>
+                                        <div className="text-xs text-gray-500 capitalize">
+                                            {user.role}
+                                        </div>
+                                    </div>
+                                    <i className={`fas fa-chevron-down text-gray-400 text-xs transition-transform duration-200 ${isProfileOpen ? 'transform rotate-180' : ''}`}></i>
+                                </button>
+
+                                {/* Profile Dropdown */}
+                                {isProfileOpen && (
+                                    <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-fade-in">
+                                        <Link
+                                            to="/profile"
+                                            className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            <i className="fas fa-user w-4 text-center"></i>
+                                            <span>My Profile</span>
+                                        </Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                        >
+                                            <i className="fas fa-sign-out-alt w-4 text-center"></i>
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

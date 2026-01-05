@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { contactAPI } from '../../services/api';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -27,19 +26,39 @@ const Contact = () => {
         setSubmitStatus(null);
 
         try {
-            await contactAPI.submitForm(formData);
+            console.log('🚀 Submitting contact form...');
+            console.log('📋 Form data:', formData);
 
-            setSubmitStatus('success');
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                subject: '',
-                message: '',
-                inquiryType: 'general'
+            // Use proxy path - this will be proxied to localhost:5000/api/contact
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
             });
+
+            console.log('📡 Response status:', response.status);
+            const data = await response.json();
+            console.log('📄 Response data:', data);
+
+            if (response.ok) {
+                setSubmitStatus('success');
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    subject: '',
+                    message: '',
+                    inquiryType: 'general'
+                });
+                console.log('✅ Contact form submitted successfully!');
+            } else {
+                console.error('❌ Server error:', data);
+                setSubmitStatus('error');
+            }
         } catch (error) {
-            console.error('Error submitting contact form:', error);
+            console.error('❌ Network error:', error);
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
@@ -258,7 +277,10 @@ const Contact = () => {
                             {submitStatus === 'success' && (
                                 <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
                                     <i className="fas fa-check-circle mr-2"></i>
-                                    Thank you! Your message has been sent successfully. We'll get back to you soon.
+                                    <div>
+                                        <p className="font-medium">Message sent successfully!</p>
+                                        <p className="text-sm mt-1">Your message has been sent to our admin team. We'll get back to you within 24-48 hours via email.</p>
+                                    </div>
                                 </div>
                             )}
                             {submitStatus === 'error' && (

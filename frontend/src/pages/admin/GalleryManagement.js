@@ -196,7 +196,7 @@ const GalleryManagement = () => {
                                 <div className="aspect-square bg-gradient-to-br from-red-cross-100 to-red-cross-200 flex items-center justify-center overflow-hidden">
                                     {image.imageUrl ? (
                                         <img
-                                            src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${image.thumbnailUrl || image.imageUrl}`}
+                                            src={image.thumbnailUrl || image.imageUrl}
                                             alt={image.seoData?.altText || image.title}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {

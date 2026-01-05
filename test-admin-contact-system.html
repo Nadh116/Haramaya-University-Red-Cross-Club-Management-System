@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Contact System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .success {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .error {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+
+        .info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+        }
+
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+
+        .contact-item {
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .status-new {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .status-in-progress {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .status-resolved {
+            border-left: 4px solid #10b981;
+        }
+
+        .status-closed {
+            border-left: 4px solid #6b7280;
+        }
+
+        .priority-urgent {
+            background: #fef2f2;
+        }
+
+        .priority-high {
+            background: #fef3c7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔧 Admin Contact Management System Test</h1>
+
+    <div class="section info">
+        <h2>📊 System Overview</h2>
+        <p><strong>Frontend:</strong> React running on <span id="frontendUrl">http://localhost:3002</span></p>
+        <p><strong>Backend:</strong> Node.js/Express on <span id="backendUrl">http://localhost:5000</span></p>
+        <p><strong>Admin Route:</strong> <code>/contact/admin</code> (requires authentication)</p>
+    </div>
+
+    <div class="section">
+        <h2>🧪 Test Contact Form Submission</h2>
+        <button onclick="submitTestContact()">Submit Test Contact</button>
+        <div id="submitResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Contact Database Records</h2>
+        <p><em>Note: Admin routes require authentication. In production, you would access these through the React admin
+                panel.</em></p>
+        <button onclick="testPublicEndpoints()">Test Public Endpoints</button>
+        <button onclick="showAdminInstructions()">Show Admin Access Instructions</button>
+        <div id="contactsResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 Admin Panel Features</h2>
+        <div class="info">
+            <h3>✅ Implemented Features:</h3>
+            <ul>
+                <li><strong>Contact List View</strong> - Paginated list with filters</li>
+                <li><strong>Status Management</strong> - New, In Progress, Resolved, Closed</li>
+                <li><strong>Priority System</strong> - Low, Medium, High, Urgent</li>
+                <li><strong>Response System</strong> - Reply to contacts with email notifications</li>
+                <li><strong>Search & Filter</strong> - By status, type, priority, keywords</li>
+                <li><strong>Statistics Dashboard</strong> - Contact metrics and analytics</li>
+                <li><strong>Contact Details</strong> - Full contact information and history</li>
+                <li><strong>Assignment System</strong> - Assign contacts to team members</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔐 Authentication & Access</h2>
+        <div class="info">
+            <h3>Admin Access Requirements:</h3>
+            <ol>
+                <li><strong>Login Required:</strong> Must be logged in as admin or officer</li>
+                <li><strong>Route:</strong> <code>http://localhost:3002/contact/admin</code></li>
+                <li><strong>Roles:</strong> Admin, Officer (configured in ProtectedRoute)</li>
+                <li><strong>JWT Token:</strong> Required in Authorization header</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Database Schema</h2>
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>name</td>
+                <td>String</td>
+                <td>Yes</td>
+                <td>Contact's full name</td>
+            </tr>
+            <tr>
+                <td>email</td>
+                <td>String</td>
+                <td>Yes</td>
+                <td>Contact's email address</td>
+            </tr>
+            <tr>
+                <td>phone</td>
+                <td>String</td>
+                <td>No</td>
+                <td>Contact's phone number</td>
+            </tr>
+            <tr>
+                <td>subject</td>
+                <td>String</td>
+                <td>Yes</td>
+                <td>Message subject</td>
+            </tr>
+            <tr>
+                <td>message</td>
+                <td>String</td>
+                <td>Yes</td>
+                <td>Message content</td>
+            </tr>
+            <tr>
+                <td>inquiryType</td>
+                <td>Enum</td>
+                <td>Yes</td>
+                <td>Type of inquiry</td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td>Enum</td>
+                <td>No</td>
+                <td>Processing status</td>
+            </tr>
+            <tr>
+                <td>priority</td>
+                <td>Enum</td>
+                <td>No</td>
+                <td>Priority level</td>
+            </tr>
+            <tr>
+                <td>assignedTo</td>
+                <td>ObjectId</td>
+                <td>No</td>
+                <td>Assigned team member</td>
+            </tr>
+            <tr>
+                <td>responses</td>
+                <td>Array</td>
+                <td>No</td>
+                <td>Admin responses</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>🚀 API Endpoints</h2>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Access</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/api/contact</td>
+                <td>Public</td>
+                <td>Submit contact form</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/contact</td>
+                <td>Admin</td>
+                <td>Get all contacts</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/contact/:id</td>
+                <td>Admin</td>
+                <td>Get single contact</td>
+            </tr>
+            <tr>
+                <td>PUT</td>
+                <td>/api/contact/:id/status</td>
+                <td>Admin</td>
+                <td>Update contact status</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/api/contact/:id/response</td>
+                <td>Admin</td>
+                <td>Add response</td>
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td>/api/contact/:id</td>
+                <td>Admin</td>
+                <td>Delete contact</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/contact/statistics</td>
+                <td>Admin</td>
+                <td>Get statistics</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        async function submitTestContact() {
+            const result = document.getElementById('submitResult');
+            result.innerHTML = '<p>Submitting test contact...</p>';
+
+            const testData = {
+                name: 'Admin Test User',
+                email: 'admin.test@example.com',
+                phone: '+251911234567',
+                subject: 'Admin System Test Contact',
+                message: 'This is a test contact submission to verify the admin management system is working correctly.',
+                inquiryType: 'general'
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Contact Submitted Successfully!</h4>
+                            <p><strong>Contact ID:</strong> ${data.data.contactId}</p>
+                            <p><strong>Submitted:</strong> ${new Date(data.data.submittedAt).toLocaleString()}</p>
+                            <p><strong>Message:</strong> ${data.message}</p>
+                            <p><em>This contact is now available in the admin panel for management.</em></p>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h4>❌ Submission Failed</h4>
+                            <p><strong>Error:</strong> ${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Make sure the backend server is running on port 5000.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testPublicEndpoints() {
+            const result = document.getElementById('contactsResult');
+            result.innerHTML = '<p>Testing public endpoints...</p>';
+
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch('http://localhost:5000/api/health');
+                const healthData = await healthResponse.json();
+
+                result.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Backend Server Status</h4>
+                        <p><strong>Status:</strong> ${healthData.message}</p>
+                        <p><strong>Database:</strong> ${healthData.status.database}</p>
+                        <p><strong>Uptime:</strong> ${healthData.status.uptime}</p>
+                        <p><strong>Environment:</strong> ${healthData.environment}</p>
+                    </div>
+                    <div class="info">
+                        <h4>📋 Admin Panel Access</h4>
+                        <p>To access contact management:</p>
+                        <ol>
+                            <li>Go to <a href="http://localhost:3002" target="_blank">http://localhost:3002</a></li>
+                            <li>Login as admin or officer</li>
+                            <li>Navigate to <code>/contact/admin</code></li>
+                        </ol>
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Server Connection Failed</h4>
+                        <p>Cannot connect to backend server. Please ensure:</p>
+                        <ul>
+                            <li>Backend server is running on port 5000</li>
+                            <li>MongoDB is connected</li>
+                            <li>No firewall blocking the connection</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function showAdminInstructions() {
+            const result = document.getElementById('contactsResult');
+            result.innerHTML = `
+                <div class="info">
+                    <h4>🔐 Admin Panel Access Instructions</h4>
+                    <h5>Step 1: Access the Frontend</h5>
+                    <p>Open <a href="http://localhost:3002" target="_blank">http://localhost:3002</a> in your browser</p>
+                    
+                    <h5>Step 2: Login as Admin</h5>
+                    <p>Use admin credentials to login (you'll need to register an admin user first)</p>
+                    
+                    <h5>Step 3: Navigate to Contact Management</h5>
+                    <p>Go to <code>http://localhost:3002/contact/admin</code> or use the admin navigation</p>
+                    
+                    <h5>Step 4: Manage Contacts</h5>
+                    <ul>
+                        <li><strong>View Contacts:</strong> See all submitted contact forms</li>
+                        <li><strong>Filter & Search:</strong> Filter by status, type, priority</li>
+                        <li><strong>Update Status:</strong> Change from New → In Progress → Resolved → Closed</li>
+                        <li><strong>Set Priority:</strong> Low, Medium, High, Urgent</li>
+                        <li><strong>Respond:</strong> Send email responses to contacts</li>
+                        <li><strong>Assign:</strong> Assign contacts to team members</li>
+                        <li><strong>Statistics:</strong> View contact analytics and metrics</li>
+                    </ul>
+                    
+                    <h5>Available Features:</h5>
+                    <div class="success">
+                        <ul>
+                            <li>✅ Contact List with Pagination</li>
+                            <li>✅ Advanced Filtering System</li>
+                            <li>✅ Status Management Workflow</li>
+                            <li>✅ Priority Assignment</li>
+                            <li>✅ Response System with Email</li>
+                            <li>✅ Contact Assignment</li>
+                            <li>✅ Statistics Dashboard</li>
+                            <li>✅ Contact Details Modal</li>
+                            <li>✅ Search Functionality</li>
+                            <li>✅ Bulk Operations</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Auto-test on page load
+        window.onload = function () {
+            testPublicEndpoints();
+        };
+    </script>
+</body>
+
+</html>
