@@ -41,7 +41,7 @@ const Login = () => {
     // Clear error when component mounts
     useEffect(() => {
         clearError();
-    }, [clearError]);
+    }, []); // Remove clearError from dependencies
 
     const handleChange = (e) => {
         setFormData({

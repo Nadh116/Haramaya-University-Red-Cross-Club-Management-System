@@ -2,10 +2,8 @@ import axios from 'axios';
 
 // Create axios instance
 const api = axios.create({
-    baseURL: process.env.NODE_ENV === 'production'
-        ? process.env.REACT_APP_API_URL || 'https://haramaya-university-red-cross-club-or7q.onrender.com/api'
-        : '/api', // Use proxy in development
-    timeout: 10000,
+    baseURL: 'https://haramaya-university-red-cross-club-or7q.onrender.com/api',
+    timeout: 30000, // Increased timeout for slow connections
     headers: {
         'Content-Type': 'application/json',
     },
@@ -18,7 +16,7 @@ api.interceptors.request.use(
         console.log('🔗 Full URL:', config.baseURL + config.url);
 
         // Don't add auth token for public endpoints
-        const publicEndpoints = [];
+        const publicEndpoints = ['/auth/login', '/auth/register'];
         const isPublicContactSubmission = config.url === '/contact' && config.method?.toLowerCase() === 'post';
         const isPublicEndpoint = publicEndpoints.some(endpoint =>
             config.url === endpoint || config.url?.startsWith(endpoint + '?')
@@ -54,11 +52,9 @@ api.interceptors.response.use(
         console.error('❌ API Response Error:', error.response?.status, error.config?.url);
         console.error('❌ Error details:', error.response?.data);
 
-        // Handle 401 errors (unauthorized) - but be more selective
+        // Handle 401 errors (unauthorized)
         if (error.response?.status === 401) {
             console.log('🔓 Unauthorized error detected');
-
-            // Only redirect to login for auth-related endpoints or if it's a token verification failure
             const isAuthEndpoint = error.config?.url?.includes('/auth/');
             const isTokenExpired = error.response?.data?.message?.includes('token') ||
                 error.response?.data?.message?.includes('expired') ||
@@ -67,20 +63,16 @@ api.interceptors.response.use(
             if (isAuthEndpoint || isTokenExpired) {
                 console.log('🗑️ Clearing token and redirecting to login');
                 localStorage.removeItem('token');
-
-                // Use React Router navigation instead of window.location
                 if (window.location.pathname !== '/login') {
                     window.location.href = '/login';
                 }
-            } else {
-                console.log('⚠️ 401 error but not redirecting - might be role/permission issue');
             }
         }
 
         // Handle network errors
         if (!error.response) {
-            error.message = 'Network error. Please check your connection.';
-            console.error('🌐 Network error detected');
+            console.error('🌐 Network error - server might be down or CORS issue');
+            error.message = 'Cannot connect to server. Please try again later.';
         }
 
         return Promise.reject(error);

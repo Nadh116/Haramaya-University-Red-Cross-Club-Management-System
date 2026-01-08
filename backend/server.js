@@ -80,18 +80,15 @@ const corsOptions = {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        const allowedOrigins = process.env.NODE_ENV === 'production'
-            ? [
-                'https://haramaya-university-red-cross-club.vercel.app',
-                /^https:\/\/haramaya-university-red-cross-club-.*\.vercel\.app$/,
-                'https://your-frontend-domain.com'
-            ]
-            : [
-                'http://localhost:3000',
-                'http://localhost:3001',
-                'http://localhost:3002',
-                'http://localhost:3003'
-            ];
+        const allowedOrigins = [
+            'https://haramaya-university-red-cross-club.vercel.app',
+            /^https:\/\/haramaya-university-red-cross-club-.*\.vercel\.app$/,
+            'https://your-frontend-domain.com',
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:3002',
+            'http://localhost:3003'
+        ];
 
         // Check if origin is allowed
         const isAllowed = allowedOrigins.some(allowedOrigin => {
