@@ -74,46 +74,14 @@ if (process.env.NODE_ENV === 'production') {
     app.use('/api/auth/register', authLimiter);
 }
 
-// CORS configuration - Updated for production deployment
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        const allowedOrigins = [
-            'https://haramaya-university-red-cross-club.vercel.app',
-            /^https:\/\/haramaya-university-red-cross-club-.*\.vercel\.app$/,
-            'https://your-frontend-domain.com',
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:3002',
-            'http://localhost:3003'
-        ];
-
-        // Check if origin is allowed
-        const isAllowed = allowedOrigins.some(allowedOrigin => {
-            if (typeof allowedOrigin === 'string') {
-                return origin === allowedOrigin;
-            } else if (allowedOrigin instanceof RegExp) {
-                return allowedOrigin.test(origin);
-            }
-            return false;
-        });
-
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            console.log('CORS blocked origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+// CORS configuration - Allow all origins temporarily to fix the issue
+app.use(cors({
+    origin: true, // Allow all origins
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
-};
-
-app.use(cors(corsOptions));
+    optionsSuccessStatus: 200
+}));
 
 // Body parsing middleware with proper limits
 app.use(express.json({
