@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create axios instance
 const api = axios.create({
     baseURL: process.env.NODE_ENV === 'production'
-        ? process.env.REACT_APP_API_URL||`https://haramaya-university-red-cross-club.onrender.com/api`
+        ? process.env.REACT_APP_API_URL || 'https://haramaya-university-red-cross-club.onrender.com/api'
         : '/api', // Use proxy in development
     timeout: 10000,
     headers: {

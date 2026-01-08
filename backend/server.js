@@ -74,13 +74,49 @@ if (process.env.NODE_ENV === 'production') {
     app.use('/api/auth/register', authLimiter);
 }
 
-// CORS configuration - Updated for multiple ports
-app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? ['https://your-frontend-domain.com']
-        : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003'],
-    credentials: true
-}));
+// CORS configuration - Updated for production deployment
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = process.env.NODE_ENV === 'production'
+            ? [
+                'https://haramaya-university-red-cross-club.vercel.app',
+                /^https:\/\/haramaya-university-red-cross-club-.*\.vercel\.app$/,
+                'https://your-frontend-domain.com'
+            ]
+            : [
+                'http://localhost:3000',
+                'http://localhost:3001',
+                'http://localhost:3002',
+                'http://localhost:3003'
+            ];
+
+        // Check if origin is allowed
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+            if (typeof allowedOrigin === 'string') {
+                return origin === allowedOrigin;
+            } else if (allowedOrigin instanceof RegExp) {
+                return allowedOrigin.test(origin);
+            }
+            return false;
+        });
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing middleware with proper limits
 app.use(express.json({
@@ -132,6 +168,28 @@ app.use('/api/branches', branchRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/contact', contactRoutes);
+
+// Root endpoint - API information
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Haramaya University Red Cross Club API',
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            health: '/api/health',
+            auth: '/api/auth',
+            users: '/api/users',
+            events: '/api/events',
+            donations: '/api/donations',
+            announcements: '/api/announcements',
+            dashboard: '/api/dashboard',
+            gallery: '/api/gallery',
+            contact: '/api/contact'
+        },
+        documentation: 'Visit /api/health for system status'
+    });
+});
 
 // Health check endpoint with system status
 app.get('/api/health', async (req, res) => {
