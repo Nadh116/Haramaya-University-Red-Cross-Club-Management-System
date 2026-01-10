@@ -47,16 +47,40 @@ const Register = () => {
             console.log('🏢 Fetching branches...');
             const response = await branchAPI.getBranches();
             console.log('✅ Branches fetched:', response.data);
-            setBranches(response.data.branches || []);
 
-            if (!response.data.branches || response.data.branches.length === 0) {
+            if (response.data && response.data.branches) {
+                setBranches(response.data.branches);
+                console.log('📋 Branches set:', response.data.branches.length, 'branches');
+            } else {
                 console.warn('⚠️ No branches found in response');
+                setBranches([]);
             }
         } catch (error) {
             console.error('❌ Error fetching branches:', error);
             console.error('❌ Error details:', error.response?.data);
-            // Set empty array as fallback
-            setBranches([]);
+            console.error('❌ Error message:', error.message);
+
+            // Set fallback branches if API fails
+            const fallbackBranches = [
+                {
+                    _id: 'main-campus',
+                    name: 'Main Campus',
+                    location: 'Haramaya University Main Campus'
+                },
+                {
+                    _id: 'tech-campus',
+                    name: 'Technology Campus',
+                    location: 'Haramaya University Technology Campus'
+                },
+                {
+                    _id: 'vet-campus',
+                    name: 'Veterinary Campus',
+                    location: 'Haramaya University Veterinary Campus'
+                }
+            ];
+
+            console.log('🔄 Using fallback branches');
+            setBranches(fallbackBranches);
         } finally {
             setBranchesLoading(false);
         }
