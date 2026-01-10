@@ -74,47 +74,14 @@ if (process.env.NODE_ENV === 'production') {
     app.use('/api/auth/register', authLimiter);
 }
 
-// CORS configuration - Properly configured for production
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        const allowedOrigins = [
-            'https://haramaya-university-red-cross-club.vercel.app',
-            /^https:\/\/haramaya-university-red-cross-club-.*\.vercel\.app$/,
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:3002',
-            'http://localhost:3003'
-        ];
-
-        // Check if origin is allowed
-        const isAllowed = allowedOrigins.some(allowedOrigin => {
-            if (typeof allowedOrigin === 'string') {
-                return origin === allowedOrigin;
-            } else if (allowedOrigin instanceof RegExp) {
-                return allowedOrigin.test(origin);
-            }
-            return false;
-        });
-
-        if (isAllowed) {
-            console.log('✅ CORS allowed for origin:', origin);
-            callback(null, true);
-        } else {
-            console.log('❌ CORS blocked origin:', origin);
-            // Allow all origins for now to fix the issue
-            callback(null, true);
-        }
-    },
-    credentials: true,
+// CORS configuration - Allow all origins to fix the issue
+app.use(cors({
+    origin: '*', // Allow all origins temporarily
+    credentials: false, // Disable credentials for now
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+}));
 
 // Body parsing middleware with proper limits
 app.use(express.json({
