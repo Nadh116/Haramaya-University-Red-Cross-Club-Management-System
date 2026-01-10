@@ -19,8 +19,27 @@ const Register = () => {
         yearOfStudy: '',
         bloodType: 'Unknown'
     });
-    const [branches, setBranches] = useState([]);
-    const [branchesLoading, setBranchesLoading] = useState(true);
+    const [branches, setBranches] = useState([
+        {
+            _id: '695bf75686de74e3a4f009ee',
+            name: 'Main Campus',
+            location: 'Haramaya University Main Campus, Dire Dawa Road',
+            code: 'MAIN'
+        },
+        {
+            _id: '695bf75686de74e3a4f009ef',
+            name: 'Technology Campus',
+            location: 'Haramaya University Technology Campus',
+            code: 'TECH'
+        },
+        {
+            _id: '695bf75686de74e3a4f009f0',
+            name: 'Veterinary Campus',
+            location: 'Haramaya University Veterinary Campus',
+            code: 'VET'
+        }
+    ]); // Start with branches already loaded
+    const [branchesLoading, setBranchesLoading] = useState(false); // Start with false since we have branches
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState({});
@@ -42,75 +61,20 @@ const Register = () => {
     }, [clearError]);
 
     const fetchBranches = async () => {
+        // Branches are already set in useState, but try to fetch from API to update them
         try {
-            setBranchesLoading(true);
-            console.log('🏢 Fetching branches...');
+            console.log('🏢 Trying to fetch branches from API...');
+            const response = await branchAPI.getBranches();
+            console.log('✅ Branches fetched from API:', response.data);
 
-            // First, set fallback branches immediately
-            const fallbackBranches = [
-                {
-                    _id: '695bf75686de74e3a4f009ee',
-                    name: 'Main Campus',
-                    location: 'Haramaya University Main Campus, Dire Dawa Road',
-                    code: 'MAIN'
-                },
-                {
-                    _id: '695bf75686de74e3a4f009ef',
-                    name: 'Technology Campus',
-                    location: 'Haramaya University Technology Campus',
-                    code: 'TECH'
-                },
-                {
-                    _id: '695bf75686de74e3a4f009f0',
-                    name: 'Veterinary Campus',
-                    location: 'Haramaya University Veterinary Campus',
-                    code: 'VET'
-                }
-            ];
-
-            setBranches(fallbackBranches);
-            console.log('📋 Fallback branches set:', fallbackBranches.length, 'branches');
-
-            // Try to fetch from API, but don't fail if it doesn't work
-            try {
-                const response = await branchAPI.getBranches();
-                console.log('✅ Branches fetched from API:', response.data);
-
-                if (response.data && response.data.branches && response.data.branches.length > 0) {
-                    setBranches(response.data.branches);
-                    console.log('📋 API branches set:', response.data.branches.length, 'branches');
-                }
-            } catch (apiError) {
-                console.log('⚠️ API fetch failed, using fallback branches');
-                console.error('API Error:', apiError.message);
+            if (response.data && response.data.branches && response.data.branches.length > 0) {
+                setBranches(response.data.branches);
+                console.log('📋 Updated branches from API:', response.data.branches.length, 'branches');
             }
-
         } catch (error) {
-            console.error('❌ Error in fetchBranches:', error);
-
-            // Ensure we always have branches
-            const fallbackBranches = [
-                {
-                    _id: 'main-campus',
-                    name: 'Main Campus',
-                    location: 'Haramaya University Main Campus'
-                },
-                {
-                    _id: 'tech-campus',
-                    name: 'Technology Campus',
-                    location: 'Haramaya University Technology Campus'
-                },
-                {
-                    _id: 'vet-campus',
-                    name: 'Veterinary Campus',
-                    location: 'Haramaya University Veterinary Campus'
-                }
-            ];
-
-            console.log('🔄 Using emergency fallback branches');
-            setBranches(fallbackBranches);
-        } finally {
-            setBranchesLoading(false);
+            console.log('⚠️ API fetch failed, keeping default branches');
+            console.error('API Error:', error.message);
+            // Keep the default branches that are already set
         }
     };
 
