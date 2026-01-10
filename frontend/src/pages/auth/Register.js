@@ -20,6 +20,7 @@ const Register = () => {
         bloodType: 'Unknown'
     });
     const [branches, setBranches] = useState([]);
+    const [branchesLoading, setBranchesLoading] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState({});
@@ -42,10 +43,22 @@ const Register = () => {
 
     const fetchBranches = async () => {
         try {
+            setBranchesLoading(true);
+            console.log('🏢 Fetching branches...');
             const response = await branchAPI.getBranches();
-            setBranches(response.data.branches);
+            console.log('✅ Branches fetched:', response.data);
+            setBranches(response.data.branches || []);
+
+            if (!response.data.branches || response.data.branches.length === 0) {
+                console.warn('⚠️ No branches found in response');
+            }
         } catch (error) {
-            console.error('Error fetching branches:', error);
+            console.error('❌ Error fetching branches:', error);
+            console.error('❌ Error details:', error.response?.data);
+            // Set empty array as fallback
+            setBranches([]);
+        } finally {
+            setBranchesLoading(false);
         }
     };
 
@@ -272,11 +285,14 @@ const Register = () => {
                                             id="branch"
                                             name="branch"
                                             required
-                                            className={`input appearance-none bg-white pr-10 ${errors.branch ? 'border-red-300' : ''}`}
+                                            disabled={branchesLoading}
+                                            className={`input appearance-none bg-white pr-10 ${errors.branch ? 'border-red-300' : ''} ${branchesLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             value={formData.branch}
                                             onChange={handleChange}
                                         >
-                                            <option value="">Select your campus</option>
+                                            <option value="">
+                                                {branchesLoading ? 'Loading branches...' : 'Select your campus'}
+                                            </option>
                                             {branches.map((branch) => (
                                                 <option key={branch._id} value={branch._id}>
                                                     {branch.name} - {branch.location}
@@ -284,11 +300,21 @@ const Register = () => {
                                             ))}
                                         </select>
                                         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                            <i className="fas fa-chevron-down text-gray-400"></i>
+                                            {branchesLoading ? (
+                                                <LoadingSpinner size="sm" />
+                                            ) : (
+                                                <i className="fas fa-chevron-down text-gray-400"></i>
+                                            )}
                                         </div>
                                     </div>
                                     {errors.branch && (
                                         <p className="mt-1 text-sm text-red-600">{errors.branch}</p>
+                                    )}
+                                    {branches.length === 0 && !branchesLoading && (
+                                        <p className="mt-1 text-sm text-yellow-600">
+                                            <i className="fas fa-exclamation-triangle mr-1"></i>
+                                            No branches available. Please contact administrator.
+                                        </p>
                                     )}
                                 </div>
 
