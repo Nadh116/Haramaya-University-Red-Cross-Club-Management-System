@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-// Create axios instance
+// Create axios instance with proper URL formatting
 const api = axios.create({
-    baseURL: 'https://haramaya-university-red-cross-club-or7q.onrender.com/api',
+    baseURL: process.env.NODE_ENV === 'production'
+        ? (process.env.REACT_APP_API_URL || 'https://haramaya-university-red-cross-club-or7q.onrender.com/api')
+        : 'https://haramaya-university-red-cross-club-or7q.onrender.com/api', // Always use deployed backend
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
     },
-    // Add these headers to help with CORS
-    withCredentials: false, // Disable credentials for now
 });
 
 // Request interceptor to add auth token
@@ -17,17 +17,11 @@ api.interceptors.request.use(
         console.log('📡 API Request:', config.method?.toUpperCase(), config.url);
         console.log('🔗 Full URL:', config.baseURL + config.url);
 
-        // Add CORS headers for preflight requests
-        config.headers['Access-Control-Allow-Origin'] = '*';
-        config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
-        config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
-
         // Don't add auth token for public endpoints
-        const publicEndpoints = ['/auth/login', '/auth/register'];
-        const isPublicContactSubmission = config.url === '/contact' && config.method?.toLowerCase() === 'post';
+        const publicEndpoints = ['/auth/login', '/auth/register', '/contact'];
         const isPublicEndpoint = publicEndpoints.some(endpoint =>
             config.url === endpoint || config.url?.startsWith(endpoint + '?')
-        ) || isPublicContactSubmission;
+        );
 
         if (!isPublicEndpoint) {
             const token = localStorage.getItem('token');
