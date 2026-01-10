@@ -45,22 +45,50 @@ const Register = () => {
         try {
             setBranchesLoading(true);
             console.log('🏢 Fetching branches...');
-            const response = await branchAPI.getBranches();
-            console.log('✅ Branches fetched:', response.data);
 
-            if (response.data && response.data.branches) {
-                setBranches(response.data.branches);
-                console.log('📋 Branches set:', response.data.branches.length, 'branches');
-            } else {
-                console.warn('⚠️ No branches found in response');
-                setBranches([]);
+            // First, set fallback branches immediately
+            const fallbackBranches = [
+                {
+                    _id: '695bf75686de74e3a4f009ee',
+                    name: 'Main Campus',
+                    location: 'Haramaya University Main Campus, Dire Dawa Road',
+                    code: 'MAIN'
+                },
+                {
+                    _id: '695bf75686de74e3a4f009ef',
+                    name: 'Technology Campus',
+                    location: 'Haramaya University Technology Campus',
+                    code: 'TECH'
+                },
+                {
+                    _id: '695bf75686de74e3a4f009f0',
+                    name: 'Veterinary Campus',
+                    location: 'Haramaya University Veterinary Campus',
+                    code: 'VET'
+                }
+            ];
+
+            setBranches(fallbackBranches);
+            console.log('📋 Fallback branches set:', fallbackBranches.length, 'branches');
+
+            // Try to fetch from API, but don't fail if it doesn't work
+            try {
+                const response = await branchAPI.getBranches();
+                console.log('✅ Branches fetched from API:', response.data);
+
+                if (response.data && response.data.branches && response.data.branches.length > 0) {
+                    setBranches(response.data.branches);
+                    console.log('📋 API branches set:', response.data.branches.length, 'branches');
+                }
+            } catch (apiError) {
+                console.log('⚠️ API fetch failed, using fallback branches');
+                console.error('API Error:', apiError.message);
             }
-        } catch (error) {
-            console.error('❌ Error fetching branches:', error);
-            console.error('❌ Error details:', error.response?.data);
-            console.error('❌ Error message:', error.message);
 
-            // Set fallback branches if API fails
+        } catch (error) {
+            console.error('❌ Error in fetchBranches:', error);
+
+            // Ensure we always have branches
             const fallbackBranches = [
                 {
                     _id: 'main-campus',
@@ -79,7 +107,7 @@ const Register = () => {
                 }
             ];
 
-            console.log('🔄 Using fallback branches');
+            console.log('🔄 Using emergency fallback branches');
             setBranches(fallbackBranches);
         } finally {
             setBranchesLoading(false);
@@ -317,11 +345,17 @@ const Register = () => {
                                             <option value="">
                                                 {branchesLoading ? 'Loading branches...' : 'Select your campus'}
                                             </option>
-                                            {branches.map((branch) => (
-                                                <option key={branch._id} value={branch._id}>
-                                                    {branch.name} - {branch.location}
+                                            {branches && branches.length > 0 ? (
+                                                branches.map((branch) => (
+                                                    <option key={branch._id} value={branch._id}>
+                                                        {branch.name} - {branch.location}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="" disabled>
+                                                    No branches available
                                                 </option>
-                                            ))}
+                                            )}
                                         </select>
                                         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                                             {branchesLoading ? (
@@ -338,6 +372,12 @@ const Register = () => {
                                         <p className="mt-1 text-sm text-yellow-600">
                                             <i className="fas fa-exclamation-triangle mr-1"></i>
                                             No branches available. Please contact administrator.
+                                        </p>
+                                    )}
+                                    {/* Debug info - remove in production */}
+                                    {process.env.NODE_ENV === 'development' && (
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            Debug: {branches.length} branches loaded, Loading: {branchesLoading ? 'Yes' : 'No'}
                                         </p>
                                     )}
                                 </div>
