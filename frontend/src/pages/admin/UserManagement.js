@@ -167,7 +167,7 @@ const UserManagement = () => {
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-                            <p className="text-gray-600">Manage Users, approvals, and permissions</p>
+                            <p className="text-gray-600">Manage users, approvals, and permissions</p>
                         </div>
                         {currentUser?.role === 'admin' && (
                             <button
