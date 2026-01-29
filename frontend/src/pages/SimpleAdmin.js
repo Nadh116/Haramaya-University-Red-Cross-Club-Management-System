@@ -55,7 +55,7 @@ const SimpleAdmin = () => {
                         </div>
                         <div className="flex items-center space-x-4">
                             <span className="text-sm text-gray-600">
-                                WELCOME, {user?.firstName} {user?.lastName}
+                                welcome, {user?.firstName} {user?.lastName}
                             </span>
                             <button
                                 onClick={logout}
