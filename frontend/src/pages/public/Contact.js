@@ -13,7 +13,7 @@ const ContactPage = () => {
                             Contact Us
                         </h1>
                         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                             opportunities, emergency assistance,
+                            Get in touch with us for volunteer opportunities, emergency assistance,
                             blood donation inquiries, or any questions about our humanitarian services.
                         </p>
                     </div>
