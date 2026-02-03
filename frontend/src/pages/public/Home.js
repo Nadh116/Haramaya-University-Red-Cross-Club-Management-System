@@ -86,7 +86,7 @@ const Home = () => {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animate-stagger-4">
                                 <Link to="/register" className="btn btn-lg bg-white text-red-cross-600 hover:bg-gray-100 hover-glow transform hover:scale-105 transition-all duration-300">
                                     <i className="fas fa-user-plus mr-2"></i>
-                                    Register as a 
+                                    Register as a Volunteer
                                 </Link>
                                 <Link to="/events" className="btn btn-lg btn-outline border-white text-white hover:bg-white hover:text-red-cross-600 transform hover:scale-105 transition-all duration-300">
                                     <i className="fas fa-calendar mr-2"></i>
