@@ -79,7 +79,7 @@ const Home = () => {
 
                             <div className="mb-8 animate-slide-up animate-stagger-3">
                                 <p className="text-lg italic" style={{ color: '#0F172A' }}>
-                                    "Building stronger communities through humanitarian service"
+                                    " stronger communities through humanitarian service"
                                 </p>
                             </div>
 
